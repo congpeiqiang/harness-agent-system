@@ -7,6 +7,7 @@
 from app.processors import PDFParser, _compute_file_hash, _compute_bytes_hash, _decode_content, _do_parse_pdf_from_file
 from langchain.tools import tool
 from app.core.config import settings
+import logger
 
 # 模块级共享 PDFParser 实例，供 @tool 函数使用缓存
 _shared_parser = PDFParser()
