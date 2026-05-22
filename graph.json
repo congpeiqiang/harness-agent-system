@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+    "."
+  ],
+  "_buildId": "id_MC81OmFIVnBZMlhrdUp2bG43bmx2TG82ZVVGS1dRPT06MTA2ODVmODc=",
+  "graphs": {
+    "chat_agent": {
+      "path": "./src/app/agents/agent.py:agent"
+    }
+  },
+  "env": ".env"
+}
