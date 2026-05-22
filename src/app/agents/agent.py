@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from langchain.agents.middleware import before_model
 from langchain.agents import AgentState
 from langgraph.runtime import Runtime
+from app.tools import parse_pdf_from_file, parse_pdf_from_content
 load_dotenv()
 
 def get_weather(city: str) -> str:
@@ -26,12 +27,12 @@ def print_hook(state: AgentState, runtime: Runtime):
 
 agent = create_agent(
     model="deepseek-chat",
-    tools=[get_weather],
+    tools=[get_weather, parse_pdf_from_file, parse_pdf_from_content],
     system_prompt="You are a helpful assistant",
     middleware=[print_hook]
 )
 
 result = agent.invoke(
-    {"messages": [{"role": "user", "content": "What's the weather in San Francisco?"}]}
+    {"messages": [{"role": "user", "content": r"What's the weather in San Francisco?, 解析 D:\code_work_space\llm\huice\008\harness-agent-system\src\app\examples\旅行日记.pdf"}]}
 )
 print(result["messages"][-1].content_blocks)

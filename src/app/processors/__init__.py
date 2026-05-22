@@ -5,6 +5,6 @@
 @Desc    :   处理器模块，提供 PDF 解析等功能
 """
 
-from app.processors.pdf_parser import PDFParser, parse_pdf_from_file, parse_pdf_from_content
+from app.processors.pdf_parser import PDFParser, _compute_file_hash, _compute_bytes_hash, _decode_content, _do_parse_pdf_from_file
 
-__all__ = ["PDFParser", "parse_pdf_from_file", "parse_pdf_from_content"]
+__all__ = ["PDFParser", "_compute_file_hash", "_compute_bytes_hash", "_decode_content", "_do_parse_pdf_from_file"]
