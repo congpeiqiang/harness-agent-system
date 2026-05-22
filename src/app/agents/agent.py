@@ -25,14 +25,14 @@ def print_hook(state: AgentState, runtime: Runtime):
     return state
 
 
-agent = create_agent(
+chat_agent = create_agent(
     model="deepseek-chat",
     tools=[get_weather, parse_pdf_from_file, parse_pdf_from_content],
     system_prompt="You are a helpful assistant",
     middleware=[print_hook]
 )
 
-result = agent.invoke(
-    {"messages": [{"role": "user", "content": r"What's the weather in San Francisco?, 解析 D:\code_work_space\llm\huice\008\harness-agent-system\src\app\examples\旅行日记.pdf"}]}
-)
-print(result["messages"][-1].content_blocks)
+# result = chat_agent.invoke(
+#     {"messages": [{"role": "user", "content": r"What's the weather in San Francisco?, 解析 D:\code_work_space\llm\huice\008\harness-agent-system\src\app\examples\旅行日记.pdf"}]}
+# )
+# print(result["messages"][-1].content_blocks)
