@@ -7,7 +7,6 @@
 
 import base64
 import hashlib
-import logging
 import os
 import tempfile
 from typing import Any, Optional, Union
@@ -17,8 +16,10 @@ from langchain_core.tools import tool
 from langchain_pymupdf4llm import PyMuPDF4LLMLoader
 
 from app.core.config import settings
+from app.logger import setup_logger
 
-logger = logging.getLogger(__name__)
+# 获取日志记录器
+logger = setup_logger(__name__)
 
 
 def _compute_file_hash(file_path: str, chunk_size: int = 8192) -> str:

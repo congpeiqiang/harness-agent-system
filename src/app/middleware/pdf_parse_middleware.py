@@ -16,6 +16,10 @@ from langchain.messages import HumanMessage
 
 from app.tools import parse_pdf_from_file
 
+from app.logger import setup_logger
+
+# 获取日志记录器
+logger = setup_logger(__name__)
 
 class PDFParseMiddleware(AgentMiddleware):
     def awrap_model_call(
@@ -34,13 +38,14 @@ class PDFParseMiddleware(AgentMiddleware):
             扩展的模型响应对象
         """
         # 创建上传目录（如果不存在）
-        print(f"调用中间件(PDFParseMiddleware)，处理前的消息:{request}")
+        logger.info(f"调用中间件(PDFParseMiddleware)，处理前的消息:{request}")
         upload_dir = Path("uploads/pdf")
         upload_dir.mkdir(parents=True, exist_ok=True)
 
         # 获取请求中的消息和thread_id
         messages = getattr(request, "messages", [])
         thread_id = getattr(request, "thread_id", str(uuid.uuid4()))
+        logger.info(f"thread_id: {thread_id}")
 
         # 创建thread_id专属目录
         thread_dir = upload_dir / thread_id
@@ -91,7 +96,7 @@ class PDFParseMiddleware(AgentMiddleware):
                                 processed_message.content = f"{original_content}{error_msg}"
 
             processed_messages.append(processed_message)
-        print(f"调用中间件(PDFParseMiddleware)，处理后的消息: {request}")
+        logger.info(f"调用中间件(PDFParseMiddleware)，处理后的消息: {request}")
         # 使用override方法更新请求中的消息
         request = request.override(messages=processed_messages)
 
