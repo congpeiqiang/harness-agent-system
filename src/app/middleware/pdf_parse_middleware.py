@@ -22,6 +22,25 @@ logger = setup_logger(__name__)
 
 
 class PDFParseMiddleware(AgentMiddleware):
+    def _extract_thread_id(self, request: ModelRequest) -> str:
+        """
+        从请求中提取thread_id
+        
+        Args:
+            request: 模型请求对象
+            
+        Returns:
+            thread_id字符串
+        """
+        runtime = getattr(request, "runtime", None)
+        if runtime:
+            execution_info = getattr(runtime, "execution_info", None)
+            if execution_info:
+                thread_id = getattr(execution_info, "thread_id", None)
+                if thread_id:
+                    return thread_id
+        return str(uuid.uuid4())
+
     def awrap_model_call(
             self,
             request: ModelRequest,
@@ -37,28 +56,32 @@ class PDFParseMiddleware(AgentMiddleware):
         Returns:
             扩展的模型响应对象
         """
-        # 创建上传目录（如果不存在）
         messages = getattr(request, "messages", [])
         logger.info(f"调用中间件(PDFParseMiddleware)异步，处理前的消息数量: {len(messages)}")
-        upload_dir = Path("uploads/pdf")
-        upload_dir.mkdir(parents=True, exist_ok=True)
 
-        # 获取请求中的消息和thread_id
-        # 从runtime.execution_info中获取thread_id
-        runtime = getattr(request, "runtime", None)
-        if runtime:
-            execution_info = getattr(runtime, "execution_info", None)
-            if execution_info:
-                thread_id = getattr(execution_info, "thread_id", str(uuid.uuid4()))
-            else:
-                thread_id = str(uuid.uuid4())
-        else:
-            thread_id = str(uuid.uuid4())
+        # 先检查是否存在PDF附件
+        has_pdf = False
+        for message in messages:
+            if isinstance(message, HumanMessage):
+                additional_kwargs = getattr(message, "additional_kwargs", {})
+                if "attachments" in additional_kwargs:
+                    for attachment in additional_kwargs["attachments"]:
+                        if attachment.get("mimeType") == "application/pdf":
+                            has_pdf = True
+                            break
+                    if has_pdf:
+                        break
 
+        # 如果没有PDF附件，直接返回
+        if not has_pdf:
+            return handler(request)
+
+        # 获取thread_id并创建目录结构: uploads/{thread_id}/pdf
+        thread_id = self._extract_thread_id(request)
         logger.info(f"处理线程ID: {thread_id}")
 
-        # 创建thread_id专属目录
-        thread_dir = upload_dir / thread_id
+        # 创建thread_id专属目录结构
+        thread_dir = Path(f"uploads/{thread_id}/pdf")
         thread_dir.mkdir(parents=True, exist_ok=True)
 
         # 处理每个消息
@@ -83,10 +106,8 @@ class PDFParseMiddleware(AgentMiddleware):
 
                                 logger.info(f"处理PDF文件: {original_filename}")
 
-                                # 保留原始文件名，但确保文件名唯一
-                                file_extension = os.path.splitext(original_filename)[1]
-                                unique_filename = f"{original_filename}"
-                                file_path = thread_dir / unique_filename
+                                # 保留原始文件名
+                                file_path = thread_dir / original_filename
 
                                 # 解码base64数据并保存文件
                                 with open(file_path, "wb") as f:
@@ -136,28 +157,32 @@ class PDFParseMiddleware(AgentMiddleware):
         Returns:
             扩展的模型响应对象
         """
-        # 创建上传目录（如果不存在）
         messages = getattr(request, "messages", [])
         logger.info(f"调用中间件(PDFParseMiddleware)，处理前的消息数量: {len(messages)}")
-        upload_dir = Path("uploads/pdf")
-        upload_dir.mkdir(parents=True, exist_ok=True)
 
-        # 获取请求中的消息和thread_id
-        # 从runtime.execution_info中获取thread_id
-        runtime = getattr(request, "runtime", None)
-        if runtime:
-            execution_info = getattr(runtime, "execution_info", None)
-            if execution_info:
-                thread_id = getattr(execution_info, "thread_id", str(uuid.uuid4()))
-            else:
-                thread_id = str(uuid.uuid4())
-        else:
-            thread_id = str(uuid.uuid4())
+        # 先检查是否存在PDF附件
+        has_pdf = False
+        for message in messages:
+            if isinstance(message, HumanMessage):
+                additional_kwargs = getattr(message, "additional_kwargs", {})
+                if "attachments" in additional_kwargs:
+                    for attachment in additional_kwargs["attachments"]:
+                        if attachment.get("mimeType") == "application/pdf":
+                            has_pdf = True
+                            break
+                    if has_pdf:
+                        break
 
+        # 如果没有PDF附件，直接返回
+        if not has_pdf:
+            return handler(request)
+
+        # 获取thread_id并创建目录结构: uploads/{thread_id}/pdf
+        thread_id = self._extract_thread_id(request)
         logger.info(f"处理线程ID: {thread_id}")
 
-        # 创建thread_id专属目录
-        thread_dir = upload_dir / thread_id
+        # 创建thread_id专属目录结构
+        thread_dir = Path(f"uploads/{thread_id}/pdf")
         thread_dir.mkdir(parents=True, exist_ok=True)
 
         # 处理每个消息
@@ -182,10 +207,8 @@ class PDFParseMiddleware(AgentMiddleware):
 
                                 logger.info(f"处理PDF文件: {original_filename}")
 
-                                # 保留原始文件名，但确保文件名唯一
-                                file_extension = os.path.splitext(original_filename)[1]
-                                unique_filename = f"{original_filename}"
-                                file_path = thread_dir / unique_filename
+                                # 保留原始文件名
+                                file_path = thread_dir / original_filename
 
                                 # 解码base64数据并保存文件
                                 with open(file_path, "wb") as f:
