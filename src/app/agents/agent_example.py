@@ -26,8 +26,14 @@ from langchain_deepseek import ChatDeepSeek
 # print("=====")
 # print(response.content)
 
-# doubao
-os.environ["OPENAI_API_KEY"] = "ark-e8825f80-b0bf-422d-a895-9973de6856b3-c2c33"
-model = init_chat_model("doubao-seed-2-0-lite-260428", model_provider="openai", base_url="https://ark.cn-beijing.volces.com/api/v3")
-response = model.invoke("Why do parrots talk?")
-print(response)
+# # doubao
+# os.environ["OPENAI_API_KEY"] = "ark-e8825f80-b0bf-422d-a895-9973de6856b3-c2c33"
+# model = init_chat_model("doubao-seed-2-0-lite-260428", model_provider="openai", base_url="https://ark.cn-beijing.volces.com/api/v3")
+# response = model.invoke("Why do parrots talk?")
+# print(response)
+
+# # kimi
+# os.environ["OPENAI_API_KEY"] = "sk-TyFSp2THhYwrWskW4QMVdieM3l5yJe2mgYVezRPFzm8kxiYW"
+# model = init_chat_model("kimi-k2.6", model_provider="openai", base_url="https://kimi.a7m.com.cn/v1")
+# response = model.invoke("你是谁,请自我介绍?")
+# print(response)
