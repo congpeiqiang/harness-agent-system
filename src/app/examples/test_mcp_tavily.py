@@ -79,7 +79,7 @@ async def test_tavily_search(
     tools = await client.get_tools()
     logger.info(f"可用工具: {[t.name for t in tools]}")
 
-    return result
+    return tools
 
 
 async def test_tavily_raw_tools(api_key: str, query: str):
