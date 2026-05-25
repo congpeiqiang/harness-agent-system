@@ -3,4 +3,5 @@
   <component name="Black">
     <option name="sdkName" value="uv (harness-agent-system)" />
   </component>
+  <component name="ProjectRootManager" version="2" project-jdk-name="uv (harness-agent-system)" project-jdk-type="Python SDK" />
 </project>
