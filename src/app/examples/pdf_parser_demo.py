@@ -32,7 +32,7 @@ parser_basic = PDFParser(
     enable_multimodal=False  # 关闭多模态
 )
 
-file_path = "旅行日记.pdf"
+file_path = "../resources/旅行日记.pdf"
 
 try:
     # 第一次解析 - 会从文件加载

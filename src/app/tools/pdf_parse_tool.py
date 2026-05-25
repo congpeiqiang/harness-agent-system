@@ -4,10 +4,22 @@
 @Time    :  2026/5/22 14:07
 @Desc    :  
 """
+import tempfile
+
 from app.processors import PDFParser, _compute_file_hash, _compute_bytes_hash, _decode_content, _do_parse_pdf_from_file
 from langchain.tools import tool
 from app.core.config import settings
-import logger
+import logging
+
+# 1. 配置 logging (只需在程序入口配置一次)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+
+# 2. 获取 logger 实例
+# 建议传入 __name__，这样可以看到日志是来自哪个模块
+logger = logging.getLogger(__name__)
 
 # 模块级共享 PDFParser 实例，供 @tool 函数使用缓存
 _shared_parser = PDFParser()
