@@ -4,21 +4,22 @@
 @Time    :   2026/5/25
 @Desc    :   Docling PDF 解析器演示脚本
 
-使用方法:
-    1. 直接运行测试现有 PDF 文件:
+使用方法（支持直接运行和模块运行）:
+    1. 直接运行（推荐）:
+       python src/app/examples/docling_pdf_parser_demo.py
+       python src/app/examples/docling_pdf_parser_demo.py --file /path/to/your.pdf
+       python src/app/examples/docling_pdf_parser_demo.py --url https://patentimages.storage.googleapis.com/aa/80/e5/7ef9a628254e36/CN1406291A.pdf
+
+    2. 模块运行:
        python -m src.app.examples.docling_pdf_parser_demo
-
-    2. 指定 PDF 文件路径:
        python -m src.app.examples.docling_pdf_parser_demo --file /path/to/your.pdf
+       python -m src.app.examples.docling_pdf_parser_demo --url https://example.com/doc.pdf
 
-    3. 指定在线 PDF URL:
-       python -m src.app.examples.docling_pdf_parser_demo --url https://patentimages.storage.googleapis.com/aa/80/e5/7ef9a628254e36/CN1406291A.pdf
+    3. 测试 base64 内容解析:
+       python src/app/examples/docling_pdf_parser_demo.py --base64
 
-    4. 测试 base64 内容解析:
-       python -m src.app.examples.docling_pdf_parser_demo --base64
-
-    5. 组合使用:
-       python -m src.app.examples.docling_pdf_parser_demo --url https://example.com/doc.pdf --base64 --export-types
+    4. 组合使用:
+       python src/app/examples/docling_pdf_parser_demo.py --url https://example.com/doc.pdf --base64 --export-types
 """
 
 import argparse
@@ -31,9 +32,15 @@ import requests
 from urllib.parse import urlparse
 
 # 添加项目根目录到 Python 路径
-project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+script_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.dirname(os.path.dirname(os.path.dirname(script_dir)))
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
+
+# 同时添加 src 目录到路径
+src_dir = os.path.join(project_root, "src")
+if src_dir not in sys.path:
+    sys.path.insert(0, src_dir)
 
 from app.processors.docling_pdf_parser import DoclingPDFParser
 from app.tools.docling_pdf_tool import (
@@ -277,4 +284,61 @@ def main():
     # 处理 URL
     if args.url:
         if not is_url(args.url):
-            print(f"错误: 无效的 URL: {
+            print(f"错误: 无效的 URL: {args.url}")
+            sys.exit(1)
+        pdf_path = download_pdf(args.url)
+        is_temp_file = True
+    # 处理本地文件
+    elif args.file:
+        if is_url(args.file):
+            print("检测到 URL，请使用 --url 参数指定在线 PDF")
+            sys.exit(1)
+        pdf_path = args.file
+        if not os.path.isfile(pdf_path):
+            print(f"错误: 文件不存在: {pdf_path}")
+            sys.exit(1)
+    else:
+        pdf_path = find_sample_pdf()
+        if not pdf_path:
+            print("错误: 未找到示例 PDF 文件")
+            print(f"请在 {os.path.join(project_root, 'uploads', 'pdf')} 目录下放置一个 PDF 文件")
+            print("或使用 --file 或 --url 参数指定 PDF")
+            sys.exit(1)
+    
+    print(f"\n使用 PDF 文件: {pdf_path}")
+    if args.url:
+        print(f"来源 URL: {args.url}")
+    
+    try:
+        test_docling_parser_class(pdf_path, is_temp_file)
+        
+        if args.base64:
+            test_docling_base64_parser(pdf_path, is_temp_file)
+            is_temp_file = False
+        
+        test_docling_tools(pdf_path, is_temp_file)
+        is_temp_file = False
+        
+        if args.export_types:
+            test_export_types(pdf_path, is_temp_file)
+            is_temp_file = False
+        
+        if is_temp_file and os.path.exists(pdf_path):
+            os.remove(pdf_path)
+            print(f"\n临时文件已删除: {pdf_path}")
+        
+        print("\n" + "=" * 60)
+        print("所有测试完成!")
+        print("=" * 60)
+        
+    except Exception as e:
+        print(f"\n错误: {e}")
+        logger.error("测试失败", exc_info=True)
+        if is_temp_file and pdf_path and os.path.exists(pdf_path):
+            os.remove(pdf_path)
+            print(f"临时文件已删除: {pdf_path}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
