@@ -28,7 +28,7 @@ def print_hook(state: AgentState, runtime: Runtime):
 
 
 agent = create_agent(
-    model="deepseek-chat",
+    model="doubao-seed-1-6-vision-250815",
     tools=[get_weather, parse_pdf_from_file, parse_pdf_from_content],
     system_prompt="You are a helpful assistant",
     middleware=[print_hook, PDFParseMiddleware()]
