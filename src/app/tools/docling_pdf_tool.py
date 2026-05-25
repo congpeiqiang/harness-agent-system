@@ -2,7 +2,7 @@
 @File    :   docling_pdf_tool.py
 @Author  :   CodeGeeX
 @Time    :   2026/5/25
-@Desc    :   基于 Docling 的 PDF 解析 Tool，供 LangChain 调用，使用共享缓存
+@Desc    :   基于 Docling 的 PDF 解析 Tool，供 LangChain 调用，使用共享缓存，支持本地文件、base64 内容和在线 URL
 """
 
 from typing import Union
@@ -119,6 +119,54 @@ def docling_parse_pdf_from_content(
     except Exception as e:
         logger.exception("PDF 内容解析失败: %s", e)
         return f"错误: PDF 内容解析失败 - {str(e)}"
+
+
+@tool
+def docling_parse_pdf_from_url(
+    url: str,
+    *,
+    export_type: str = "markdown",
+    enable_multimodal: bool = False,
+    timeout: int = 60,
+) -> str:
+    """使用 Docling 直接解析在线 PDF URL，无需先下载到本地，返回文本内容。
+
+    Args:
+        url: PDF 文件的在线 URL（http/https）
+        export_type: 导出类型，如 "markdown" 或 "document"
+        enable_multimodal: 是否开启多模态（提取图像并识别）
+        timeout: 下载超时时间（秒），默认 60
+
+    Returns:
+        PDF 文本内容，失败时返回错误信息
+    """
+    try:
+        logger.info("开始解析在线 PDF | URL: %s | 导出类型: %s | 多模态: %s", url, export_type, enable_multimodal)
+        
+        # 使用共享的解析器实例
+        docs: list[Document] = _docling_parser.parse_url(url, timeout=timeout)
+        
+        if not docs:
+            logger.warning("在线 PDF 解析结果为空 | URL: %s", url)
+            return "解析结果为空，PDF 可能无内容"
+
+        # 拼接文档内容
+        text_parts = []
+        for doc in docs:
+            text_parts.append(doc.page_content)
+            if doc.metadata:
+                text_parts.append(f"\n[元数据: {doc.metadata}]")
+
+        full_text = "\n\n---\n\n".join(text_parts)
+        logger.info("在线 PDF 解析完成 | URL: %s | 片段数: %d | 文本长度: %d", url, len(docs), len(full_text))
+        return full_text
+
+    except ValueError as e:
+        logger.error("URL 格式错误: %s | %s", url, e)
+        return f"错误: URL 格式错误 - {e}"
+    except Exception as e:
+        logger.exception("在线 PDF 解析失败 | URL: %s | 错误: %s", url, e)
+        return f"错误: 在线 PDF 解析失败 - {str(e)}"
 
 
 @tool

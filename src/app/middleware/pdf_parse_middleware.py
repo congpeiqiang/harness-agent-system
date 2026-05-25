@@ -39,7 +39,7 @@ class PDFParseMiddleware(AgentMiddleware):
         """
         # 创建上传目录（如果不存在）
         messages = getattr(request, "messages", [])
-        logger.info(f"调用中间件(PDFParseMiddleware)，处理前的消息数量: {len(messages)}")
+        logger.info(f"调用中间件(PDFParseMiddleware)异步，处理前的消息数量: {len(messages)}")
         upload_dir = Path("uploads/pdf")
         upload_dir.mkdir(parents=True, exist_ok=True)
 
@@ -114,7 +114,7 @@ class PDFParseMiddleware(AgentMiddleware):
 
             processed_messages.append(processed_message)
 
-        logger.info(f"调用中间件(PDFParseMiddleware)，处理后的消息数量: {len(processed_messages)}")
+        logger.info(f"调用中间件(PDFParseMiddleware)异步，处理后的消息数量: {len(processed_messages)}")
         # 使用override方法更新请求中的消息
         request = request.override(messages=processed_messages)
 

@@ -44,8 +44,9 @@ if src_dir not in sys.path:
 
 from app.processors.docling_pdf_parser import DoclingPDFParser
 from app.tools.docling_pdf_tool import (
-    parse_pdf_from_file_docling,
-    parse_pdf_from_content_docling,
+    docling_parse_pdf_from_file,
+    docling_parse_pdf_from_content,
+    docling_parse_pdf_from_url,
 )
 from app.logger import setup_logger
 
@@ -202,9 +203,9 @@ def test_docling_tools(pdf_path: str, is_temp: bool = False):
     print("测试 3: Docling Tool 函数")
     print("=" * 60)
     
-    print("\n--- parse_pdf_from_file_docling ---")
+    print("\n--- docling_parse_pdf_from_file ---")
     start_time = time.time()
-    result = parse_pdf_from_file_docling.invoke({"file_path": pdf_path})
+    result = docling_parse_pdf_from_file.invoke({"file_name": pdf_path})
     tool_time = time.time() - start_time
     
     print(f"耗时: {tool_time:.2f} 秒")
@@ -215,13 +216,73 @@ def test_docling_tools(pdf_path: str, is_temp: bool = False):
     
     print("\n--- 缓存测试 (第二次调用) ---")
     start_time = time.time()
-    result_cached = parse_pdf_from_file_docling.invoke({"file_path": pdf_path})
+    result_cached = docling_parse_pdf_from_file.invoke({"file_name": pdf_path})
     cached_time = time.time() - start_time
     print(f"缓存调用耗时: {cached_time:.4f} 秒")
     
     if is_temp and os.path.exists(pdf_path):
         os.remove(pdf_path)
         print(f"\n临时文件已删除: {pdf_path}")
+
+
+def test_docling_url_parser(url: str):
+    """测试 DoclingPDFParser 类 - parse_url 方法"""
+    print("\n" + "=" * 60)
+    print("测试 5: DoclingPDFParser 类 - parse_url 方法")
+    print("=" * 60)
+    
+    parser = DoclingPDFParser()
+    
+    print(f"\n直接解析在线 PDF: {url}")
+    start_time = time.time()
+    docs = parser.parse_url(url)
+    first_parse_time = time.time() - start_time
+    
+    print(f"\n首次解析:")
+    print(f"  耗时: {first_parse_time:.2f} 秒")
+    print(f"  文档片段数: {len(docs)}")
+    if docs:
+        content_preview = docs[0].page_content[:500] + "..." if len(docs[0].page_content) > 500 else docs[0].page_content
+        print(f"  第一片段内容预览 (前 500 字符):")
+        print(f"  {content_preview}")
+    
+    # 缓存测试
+    start_time = time.time()
+    docs_cached = parser.parse_url(url)
+    second_parse_time = time.time() - start_time
+    
+    print(f"\n缓存解析:")
+    print(f"  耗时: {second_parse_time:.4f} 秒")
+    print(f"  文档片段数: {len(docs_cached)}")
+    
+    parser.clear_cache()
+    print("\n缓存已清除")
+    
+    return docs
+
+
+def test_docling_url_tool(url: str):
+    """测试 Docling URL Tool 函数"""
+    print("\n" + "=" * 60)
+    print("测试 6: Docling URL Tool 函数")
+    print("=" * 60)
+    
+    print(f"\n--- docling_parse_pdf_from_url ---")
+    start_time = time.time()
+    result = docling_parse_pdf_from_url.invoke({"url": url})
+    tool_time = time.time() - start_time
+    
+    print(f"耗时: {tool_time:.2f} 秒")
+    print(f"返回文本长度: {len(result)} characters")
+    print(f"内容预览 (前 500 字符):")
+    preview = result[:500] + "..." if len(result) > 500 else result
+    print(preview)
+    
+    print("\n--- 缓存测试 (第二次调用) ---")
+    start_time = time.time()
+    result_cached = docling_parse_pdf_from_url.invoke({"url": url})
+    cached_time = time.time() - start_time
+    print(f"缓存调用耗时: {cached_time:.4f} 秒")
 
 
 def test_export_types(pdf_path: str, is_temp: bool = False):
@@ -322,6 +383,11 @@ def main():
         if args.export_types:
             test_export_types(pdf_path, is_temp_file)
             is_temp_file = False
+        
+        # 如果指定了 URL，额外测试 URL 直接解析
+        if args.url:
+            test_docling_url_parser(args.url)
+            test_docling_url_tool(args.url)
         
         if is_temp_file and os.path.exists(pdf_path):
             os.remove(pdf_path)

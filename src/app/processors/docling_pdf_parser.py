@@ -2,13 +2,15 @@
 @File    :   docling_pdf_parser.py
 @Author  :   CodeGeeX
 @Time    :   2026/5/25
-@Desc    :   基于 Docling 的 PDF 解析器，支持多模态图像识别与共享缓存
+@Desc    :   基于 Docling 的 PDF 解析器，支持多模态图像识别与共享缓存，支持文件名、base64 内容和在线 URL 输入
 """
 
 import os
 import tempfile
 from typing import Any, Optional, Union
+from urllib.parse import urlparse
 
+import requests
 from langchain_core.documents import Document
 from langchain_docling import DoclingLoader
 
@@ -211,6 +213,68 @@ class DoclingPDFParser:
 
         return docs
 
+    def parse_url(
+        self,
+        url: str,
+        *,
+        timeout: int = 60,
+        headers: Optional[dict[str, str]] = None,
+    ) -> list[Document]:
+        """从在线 URL 直接解析 PDF，无需先下载到本地。
+
+        通过流式下载读取 PDF 内容到内存，解析完成后自动清理临时文件。
+        同一 URL 返回的内容（基于内容哈希判断）会命中缓存。
+        缓存与 PDFParser 共享。
+
+        Args:
+            url: PDF 文件的在线 URL
+            timeout: 下载超时时间（秒），默认 60
+            headers: 自定义请求头，默认使用常见浏览器 User-Agent
+
+        Returns:
+            解析后的文档片段列表
+
+        Raises:
+            ValueError: URL 格式无效
+            requests.RequestException: 下载失败
+        """
+        if not _is_valid_url(url):
+            raise ValueError(f"无效的 URL: {url}")
+
+        # 下载 PDF 内容到内存
+        pdf_bytes = _download_pdf_bytes(url, timeout=timeout, headers=headers)
+        content_hash = compute_bytes_hash(pdf_bytes)
+
+        # 命中缓存
+        cached_docs = self._cache.get(content_hash)
+        if cached_docs is not None:
+            logger.info("命中共享缓存，跳过解析 | URL: %s | 哈希: %s", url, content_hash[:12])
+            return cached_docs
+
+        # 写入临时文件并解析
+        tmp_path = None
+        try:
+            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
+                tmp.write(pdf_bytes)
+                tmp_path = tmp.name
+
+            docs = _do_parse_pdf_from_file(
+                tmp_path,
+                export_type=self._export_type,
+                enable_multimodal=self._enable_multimodal,
+                extract_images=self._extract_images,
+            )
+        finally:
+            if tmp_path and os.path.exists(tmp_path):
+                os.remove(tmp_path)
+                logger.debug("已清理临时文件: %s", tmp_path)
+
+        # 写入共享缓存
+        self._cache.set(content_hash, docs)
+        logger.info("解析完成并写入共享缓存 | URL: %s | 哈希: %s | 片段数: %d", url, content_hash[:12], len(docs))
+
+        return docs
+
     def clear_cache(self) -> None:
         """清除全部缓存（会清除所有解析器共享的缓存）。"""
         self._cache.clear()
@@ -241,6 +305,57 @@ class DoclingPDFParser:
             raise ValueError(f"文件不是 PDF 格式: {abs_path}")
 
         return abs_path
+
+
+def _is_valid_url(url: str) -> bool:
+    """检查字符串是否为有效的 HTTP/HTTPS URL。"""
+    parsed = urlparse(url)
+    return parsed.scheme in ("http", "https") and bool(parsed.netloc)
+
+
+def _download_pdf_bytes(
+    url: str,
+    *,
+    timeout: int = 60,
+    headers: Optional[dict[str, str]] = None,
+) -> bytes:
+    """从 URL 下载 PDF 内容到内存。
+
+    Args:
+        url: PDF 文件 URL
+        timeout: 请求超时时间（秒）
+        headers: 自定义请求头
+
+    Returns:
+        PDF 原始字节内容
+
+    Raises:
+        requests.RequestException: 网络请求失败
+        ValueError: 响应内容类型不是 PDF
+    """
+    default_headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+            "AppleWebKit/537.36 (KHTML, like Gecko) "
+            "Chrome/120.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/pdf,*/*;q=0.9",
+    }
+    if headers:
+        default_headers.update(headers)
+
+    logger.info("开始下载 PDF | URL: %s", url)
+    response = requests.get(url, headers=default_headers, timeout=timeout, stream=True)
+    response.raise_for_status()
+
+    # 检查 Content-Type（容错：未声明时也继续）
+    content_type = response.headers.get("Content-Type", "").lower()
+    if content_type and "pdf" not in content_type and "octet-stream" not in content_type:
+        logger.warning("响应 Content-Type 可能不是 PDF: %s", content_type)
+
+    pdf_bytes = response.content
+    logger.info("下载完成 | URL: %s | 大小: %d bytes", url, len(pdf_bytes))
+    return pdf_bytes
 
 
 # 为了向后兼容，导出公共函数

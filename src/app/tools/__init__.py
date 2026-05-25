@@ -7,6 +7,7 @@
 from app.tools.pdf_parse_tool import (
     parse_pdf_from_file,
     parse_pdf_from_content,
+    parse_pdf_from_url,
     clear_pdf_cache,
     get_cache_stats,
 )
@@ -20,6 +21,7 @@ from app.tools.docling_pdf_tool import (
 __all__ = [
     "parse_pdf_from_file",
     "parse_pdf_from_content",
+    "parse_pdf_from_url",
     "clear_pdf_cache",
     "get_cache_stats",
     "docling_parse_pdf_from_file",
