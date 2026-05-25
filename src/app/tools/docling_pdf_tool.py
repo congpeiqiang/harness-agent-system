@@ -1,119 +1,158 @@
 """
-@File    :  docling_pdf_tool.py
-@Author  :  CodeGeeX
-@Time    :  2026/5/25
-@Desc    :  基于 Docling 的 PDF 解析工具
+@File    :   docling_pdf_tool.py
+@Author  :   CodeGeeX
+@Time    :   2026/5/25
+@Desc    :   基于 Docling 的 PDF 解析 Tool，供 LangChain 调用，使用共享缓存
 """
-import tempfile
 
-from langchain.tools import tool
+from typing import Union
 
-from app.processors.docling_pdf_parser import (
-    DoclingPDFParser,
-    _compute_file_hash,
-    _compute_bytes_hash,
-    _decode_content,
-    _do_parse_pdf_from_file,
-)
+from langchain_core.tools import tool
+from langchain_core.documents import Document
+
 from app.core.config import settings
 from app.logger import setup_logger
+from app.processors.docling_pdf_parser import DoclingPDFParser
+from app.processors.pdf_cache import get_cache_manager, PDFCacheManager
 
 # 获取日志记录器
 logger = setup_logger(__name__)
 
-# 模块级共享 DoclingPDFParser 实例，供 @tool 函数使用缓存
-_shared_parser = DoclingPDFParser()
+# 创建模块级共享缓存管理器
+_cache_manager = get_cache_manager()
+
+# 创建模块级单例解析器（内部自动使用共享缓存）
+_docling_parser = DoclingPDFParser()
 
 
 @tool
-def parse_pdf_from_file_docling(file_path: str) -> str:
-    """使用 Docling 从文件路径解析 PDF，返回解析后的纯文本内容。
-
-    解析配置（export_type、enable_multimodal 等）从 settings 自动读取。
-    同一文件（基于内容哈希判断）不会重复解析，直接返回缓存结果。
+def docling_parse_pdf_from_file(
+    file_name: str,
+    *,
+    export_type: str = "markdown",
+    enable_multimodal: bool = False,
+) -> str:
+    """使用 Docling 解析本地 PDF 文件，返回文本内容。
 
     Args:
-        file_path: PDF 文件绝对路径
+        file_name: PDF 文件名或路径
+        export_type: 导出类型，如 "markdown" 或 "document"
+        enable_multimodal: 是否开启多模态（提取图像并识别）
 
     Returns:
-        解析后的纯文本内容
+        PDF 文本内容，失败时返回错误信息
     """
-    file_hash = _compute_file_hash(file_path)
+    try:
+        logger.info("开始解析 PDF | 文件: %s | 导出类型: %s | 多模态: %s", file_name, export_type, enable_multimodal)
+        
+        # 使用共享的解析器实例
+        docs: list[Document] = _docling_parser.parse_file(file_name)
+        
+        if not docs:
+            logger.warning("PDF 解析结果为空 | 文件: %s", file_name)
+            return "解析结果为空，PDF 可能无内容"
 
-    # 命中缓存
-    if file_hash in _shared_parser._cache:
-        logger.info("命中缓存，跳过解析 | 文件: %s | 哈希: %s", file_path, file_hash[:12])
-        docs = _shared_parser._cache[file_hash]
-    else:
-        docs = _do_parse_pdf_from_file(
-            file_path,
-            export_type=getattr(settings, "docling_export_type", "markdown"),
-            enable_multimodal=settings.enable_pdf_multimodal,
-            extract_images=settings.pdf_extract_images,
-        )
-        _shared_parser._evict_if_needed()
-        _shared_parser._cache[file_hash] = docs
-        logger.info("解析完成并缓存 | 文件: %s | 哈希: %s | 片段数: %d", file_path, file_hash[:12], len(docs))
+        # 拼接文档内容
+        text_parts = []
+        for doc in docs:
+            text_parts.append(doc.page_content)
+            # 添加元数据信息（可选）
+            if doc.metadata:
+                text_parts.append(f"\n[元数据: {doc.metadata}]")
 
-    return "\n\n".join(doc.page_content for doc in docs)
+        full_text = "\n\n---\n\n".join(text_parts)
+        logger.info("PDF 解析完成 | 文件: %s | 片段数: %d | 文本长度: %d", file_name, len(docs), len(full_text))
+        return full_text
+
+    except FileNotFoundError as e:
+        logger.error("文件不存在: %s | %s", file_name, e)
+        return f"错误: 文件不存在 - {file_name}"
+    except ValueError as e:
+        logger.error("文件格式错误: %s | %s", file_name, e)
+        return f"错误: 文件格式错误 - {e}"
+    except Exception as e:
+        logger.exception("PDF 解析失败 | 文件: %s | 错误: %s", file_name, e)
+        return f"错误: PDF 解析失败 - {str(e)}"
 
 
 @tool
-def parse_pdf_from_content_docling(content: str) -> str:
-    """使用 Docling 从 base64 编码内容解析 PDF，返回解析后的纯文本内容。
-
-    解析配置（export_type、enable_multimodal 等）从 settings 自动读取。
-    同一内容（基于哈希判断）不会重复解析，直接返回缓存结果。
+def docling_parse_pdf_from_content(
+    content: str,
+    *,
+    export_type: str = "markdown",
+    enable_multimodal: bool = False,
+) -> str:
+    """使用 Docling 解析 base64 编码的 PDF 内容，返回文本内容。
 
     Args:
-        content: base64 编码的 PDF 内容字符串
+        content: base64 编码的 PDF 内容
+        export_type: 导出类型，如 "markdown" 或 "document"
+        enable_multimodal: 是否开启多模态（提取图像并识别）
 
     Returns:
-        解析后的纯文本内容
+        PDF 文本内容，失败时返回错误信息
     """
-    pdf_bytes = _decode_content(content)
-    content_hash = _compute_bytes_hash(pdf_bytes)
+    try:
+        logger.info("开始解析 PDF 内容 | 导出类型: %s | 多模态: %s", export_type, enable_multimodal)
+        
+        # 使用共享的解析器实例
+        docs: list[Document] = _docling_parser.parse_content(content)
+        
+        if not docs:
+            logger.warning("PDF 内容解析结果为空")
+            return "解析结果为空，PDF 可能无内容"
 
-    # 命中缓存
-    if content_hash in _shared_parser._cache:
-        logger.info("命中缓存，跳过解析 | 哈希: %s", content_hash[:12])
-        docs = _shared_parser._cache[content_hash]
-    else:
-        tmp_path = None
-        try:
-            with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-                tmp.write(pdf_bytes)
-                tmp_path = tmp.name
+        # 拼接文档内容
+        text_parts = []
+        for doc in docs:
+            text_parts.append(doc.page_content)
+            if doc.metadata:
+                text_parts.append(f"\n[元数据: {doc.metadata}]")
 
-            docs = _do_parse_pdf_from_file(
-                tmp_path,
-                export_type=getattr(settings, "docling_export_type", "markdown"),
-                enable_multimodal=settings.enable_pdf_multimodal,
-                extract_images=settings.pdf_extract_images,
-            )
-        finally:
-            if tmp_path and os.path.exists(tmp_path):
-                import os
-                os.remove(tmp_path)
-                logger.debug("已清理临时文件: %s", tmp_path)
+        full_text = "\n\n---\n\n".join(text_parts)
+        logger.info("PDF 内容解析完成 | 片段数: %d | 文本长度: %d", len(docs), len(full_text))
+        return full_text
 
-        _shared_parser._evict_if_needed()
-        _shared_parser._cache[content_hash] = docs
-        logger.info("解析完成并缓存 | 哈希: %s | 片段数: %d", content_hash[:12], len(docs))
-
-    return "\n\n".join(doc.page_content for doc in docs)
+    except ValueError as e:
+        logger.error("PDF 内容格式错误: %s", e)
+        return f"错误: PDF 内容格式错误 - {e}"
+    except Exception as e:
+        logger.exception("PDF 内容解析失败: %s", e)
+        return f"错误: PDF 内容解析失败 - {str(e)}"
 
 
 @tool
-def parse_pdf_with_docling_markdown(file_path: str) -> str:
-    """使用 Docling 解析 PDF，返回 Markdown 格式的内容。
+def clear_docling_pdf_cache() -> str:
+    """清除 Docling PDF 解析器的共享缓存。
 
-    这是 Docling 的特色功能，可以保留文档的表格、列表等结构化格式。
-
-    Args:
-        file_path: PDF 文件绝对路径
+    注意: 这会清除所有解析器共享的缓存，包括 PyMuPDF 解析器的缓存。
 
     Returns:
-        Markdown 格式的解析内容
+        操作结果信息
     """
-    return parse_pdf_from_file_docling.invoke({"file_path": file_path})
+    try:
+        cache_manager = get_cache_manager()
+        stats_before = cache_manager.get_stats()
+        cache_manager.clear_all()
+        stats_after = cache_manager.get_stats()
+        logger.info("已清除共享缓存 | 清除前: %s | 清除后: %s", stats_before, stats_after)
+        return f"共享缓存已清除 | 清除前: {stats_before}"
+    except Exception as e:
+        logger.exception("清除缓存失败: %s", e)
+        return f"错误: 清除缓存失败 - {str(e)}"
+
+
+@tool
+def get_docling_cache_stats() -> str:
+    """获取 Docling PDF 解析器的共享缓存状态。
+
+    Returns:
+        缓存状态信息
+    """
+    try:
+        cache_manager = get_cache_manager()
+        stats = cache_manager.get_stats()
+        return f"共享缓存状态: {stats}"
+    except Exception as e:
+        logger.exception("获取缓存状态失败: %s", e)
+        return f"错误: 获取缓存状态失败 - {str(e)}"

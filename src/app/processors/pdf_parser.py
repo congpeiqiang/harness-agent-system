@@ -5,8 +5,6 @@
 @Desc    :   PDF 解析器，支持多模态图像识别与文件哈希缓存，支持文件名和 base64 内容输入
 """
 
-import base64
-import hashlib
 import os
 import tempfile
 from typing import Any, Optional, Union
@@ -17,61 +15,16 @@ from langchain_pymupdf4llm import PyMuPDF4LLMLoader
 
 from app.core.config import settings
 from app.logger import setup_logger
+from app.processors.pdf_cache import (
+    PDFCacheManager,
+    get_cache_manager,
+    compute_file_hash,
+    compute_bytes_hash,
+    decode_content,
+)
 
 # 获取日志记录器
 logger = setup_logger(__name__)
-
-
-def _compute_file_hash(file_path: str, chunk_size: int = 8192) -> str:
-    """计算文件的 SHA-256 哈希值，用于判断文件是否相同。
-
-    Args:
-        file_path: 文件路径
-        chunk_size: 读取块大小
-
-    Returns:
-        文件的 SHA-256 十六进制摘要
-    """
-    sha256 = hashlib.sha256()
-    with open(file_path, "rb") as f:
-        while chunk := f.read(chunk_size):
-            sha256.update(chunk)
-    return sha256.hexdigest()
-
-
-def _compute_bytes_hash(data: bytes) -> str:
-    """计算字节内容的 SHA-256 哈希值，用于判断内容是否相同。
-
-    Args:
-        data: 字节内容
-
-    Returns:
-        内容的 SHA-256 十六进制摘要
-    """
-    return hashlib.sha256(data).hexdigest()
-
-
-def _decode_content(content: Union[str, bytes]) -> bytes:
-    """将输入内容解码为原始字节。
-
-    若 content 为 str，则视为 base64 编码字符串进行解码；
-    若 content 为 bytes，则直接返回。
-
-    Args:
-        content: base64 编码字符串或原始字节
-
-    Returns:
-        解码后的原始字节
-
-    Raises:
-        ValueError: base64 解码失败
-    """
-    if isinstance(content, bytes):
-        return content
-    try:
-        return base64.b64decode(content)
-    except Exception as e:
-        raise ValueError(f"content 解码失败，请确认是否为有效的 base64 编码: {e}") from e
 
 
 def _do_parse_pdf_from_file(
@@ -123,6 +76,7 @@ class PDFParser:
         1. 使用内容哈希（SHA-256）判断是否为同一文件/内容，避免重复解析
         2. 支持两种输入方式：文件名（路径）或 PDF 内容（base64 编码 / 原始字节）
         3. 核心解析逻辑委托给内部函数 _do_parse_pdf_from_file
+        4. 使用共享缓存（与 DoclingPDFParser 共享缓存）
 
     配置优先级：显式传参 > .env 环境变量 > config.py 中的默认值
 
@@ -135,11 +89,6 @@ class PDFParser:
         # 通过 base64 编码内容解析（带缓存）
         parser = PDFParser()
         docs = parser.parse_content(base64_str)
-
-        # 无需缓存时，直接使用 @tool 函数
-        from app.processors.pdf_parser import parse_pdf_from_file, parse_pdf_from_content
-        text = parse_pdf_from_file.invoke({"file_path": "/path/to/file.pdf"})
-        text = parse_pdf_from_content.invoke({"content": base64_str})
     """
 
     def __init__(
@@ -171,17 +120,19 @@ class PDFParser:
         self._table_strategy: str = table_strategy if table_strategy is not None else settings.pdf_table_strategy
         self._enable_multimodal: bool = enable_multimodal if enable_multimodal is not None else settings.enable_pdf_multimodal
         self._extract_images: bool = extract_images if extract_images is not None else settings.pdf_extract_images
-        self._max_cache_size: int = max_cache_size if max_cache_size is not None else settings.pdf_max_cache_size
+        
+        # 使用共享缓存管理器
+        cache_size = max_cache_size if max_cache_size is not None else settings.pdf_max_cache_size
+        self._cache: PDFCacheManager = get_cache_manager(cache_size)
 
         self._custom_images_parser = custom_images_parser
-        # 缓存字典: file_hash -> list[Document]
-        self._cache: dict[str, list[Document]] = {}
 
         logger.info(
-            "PDFParser 初始化完成 | 多模态: %s | 提取图像: %s | 模式: %s",
+            "PDFParser 初始化完成 | 多模态: %s | 提取图像: %s | 模式: %s | 共享缓存大小: %d",
             self._enable_multimodal,
             self._extract_images,
             self._mode,
+            cache_size,
         )
 
     # ------------------------------------------------------------------
@@ -192,6 +143,7 @@ class PDFParser:
         """解析 PDF 文件，返回文档片段列表。
 
         同一文件（基于内容哈希判断）不会重复解析，直接返回缓存结果。
+        缓存与 DoclingPDFParser 共享。
 
         Args:
             file_name: PDF 文件名或路径
@@ -204,15 +156,13 @@ class PDFParser:
             ValueError: 文件不是 PDF 格式
         """
         file_path = self._resolve_file_path(file_name)
-        file_hash = _compute_file_hash(file_path)
+        file_hash = compute_file_hash(file_path)
 
-        # 命中缓存
-        if file_hash in self._cache:
-            logger.info("命中缓存，跳过解析 | 文件: %s | 哈希: %s", file_name, file_hash[:12])
-            return self._cache[file_hash]
-
-        # 缓存容量控制
-        self._evict_if_needed()
+        # 命中缓存（从共享缓存获取）
+        cached_docs = self._cache.get(file_hash)
+        if cached_docs is not None:
+            logger.info("命中共享缓存，跳过解析 | 文件: %s | 哈希: %s", file_name, file_hash[:12])
+            return cached_docs
 
         # 委托内部函数执行解析
         docs = _do_parse_pdf_from_file(
@@ -224,9 +174,9 @@ class PDFParser:
             custom_images_parser=self._custom_images_parser,
         )
 
-        # 写入缓存
-        self._cache[file_hash] = docs
-        logger.info("解析完成并缓存 | 文件: %s | 哈希: %s | 片段数: %d", file_name, file_hash[:12], len(docs))
+        # 写入共享缓存
+        self._cache.set(file_hash, docs)
+        logger.info("解析完成并写入共享缓存 | 文件: %s | 哈希: %s | 片段数: %d", file_name, file_hash[:12], len(docs))
 
         return docs
 
@@ -235,6 +185,7 @@ class PDFParser:
 
         支持 base64 编码字符串或原始字节作为输入。
         同一内容（基于哈希判断）不会重复解析，直接返回缓存结果。
+        缓存与 DoclingPDFParser 共享。
 
         Args:
             content: PDF 内容，base64 编码字符串或原始字节
@@ -245,19 +196,16 @@ class PDFParser:
         Raises:
             ValueError: content 解码失败
         """
-        pdf_bytes = _decode_content(content)
-        content_hash = _compute_bytes_hash(pdf_bytes)
+        pdf_bytes = decode_content(content)
+        content_hash = compute_bytes_hash(pdf_bytes)
 
-        # 命中缓存
-        if content_hash in self._cache:
-            logger.info("命中缓存，跳过解析 | 哈希: %s", content_hash[:12])
-            return self._cache[content_hash]
+        # 命中缓存（从共享缓存获取）
+        cached_docs = self._cache.get(content_hash)
+        if cached_docs is not None:
+            logger.info("命中共享缓存，跳过解析 | 哈希: %s", content_hash[:12])
+            return cached_docs
 
-        # 缓存容量控制
-        self._evict_if_needed()
-
-        # 委托内部函数执行解析（先解码写入临时文件，再调用 _do_parse_pdf_from_file）
-        pdf_bytes = _decode_content(content)
+        # 委托内部函数执行解析
         tmp_path = None
         try:
             with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
@@ -277,16 +225,16 @@ class PDFParser:
                 os.remove(tmp_path)
                 logger.debug("已清理临时文件: %s", tmp_path)
 
-        # 写入缓存
-        self._cache[content_hash] = docs
-        logger.info("解析完成并缓存 | 哈希: %s | 片段数: %d", content_hash[:12], len(docs))
+        # 写入共享缓存
+        self._cache.set(content_hash, docs)
+        logger.info("解析完成并写入共享缓存 | 哈希: %s | 片段数: %d", content_hash[:12], len(docs))
 
         return docs
 
     def clear_cache(self) -> None:
-        """清除全部缓存。"""
+        """清除全部缓存（会清除所有解析器共享的缓存）。"""
         self._cache.clear()
-        logger.info("已清除全部缓存")
+        logger.info("已清除全部共享缓存")
 
     # ------------------------------------------------------------------
     # 内部方法
@@ -320,96 +268,17 @@ class PDFParser:
 
         return abs_path
 
-    def _evict_if_needed(self) -> None:
-        """当缓存达到上限时，移除最早的一条缓存（FIFO 策略）。"""
-        if len(self._cache) >= self._max_cache_size:
-            oldest_key = next(iter(self._cache))
-            del self._cache[oldest_key]
-            logger.info("缓存已满，移除最早条目 | 哈希: %s", oldest_key[:12])
 
+# 为了向后兼容，导出公共函数
+__all__ = [
+    "PDFParser",
+    "_do_parse_pdf_from_file",
+    "compute_file_hash",
+    "compute_bytes_hash",
+    "decode_content",
+]
 
-# # 模块级共享 PDFParser 实例，供 @tool 函数使用缓存
-# _shared_parser = PDFParser()
-#
-#
-# @tool
-# def parse_pdf_from_file(file_path: str) -> str:
-#     """从文件路径解析 PDF，返回解析后的纯文本内容。
-#
-#     解析配置（mode、table_strategy、enable_multimodal 等）从 settings 自动读取。
-#     同一文件（基于内容哈希判断）不会重复解析，直接返回缓存结果。
-#
-#     Args:
-#         file_path: PDF 文件绝对路径
-#
-#     Returns:
-#         解析后的纯文本内容
-#     """
-#     file_hash = _compute_file_hash(file_path)
-#
-#     # 命中缓存
-#     if file_hash in _shared_parser._cache:
-#         logger.info("命中缓存，跳过解析 | 文件: %s | 哈希: %s", file_path, file_hash[:12])
-#         docs = _shared_parser._cache[file_hash]
-#     else:
-#         docs = _do_parse_pdf_from_file(
-#             file_path,
-#             mode=settings.pdf_mode,
-#             table_strategy=settings.pdf_table_strategy,
-#             enable_multimodal=settings.enable_pdf_multimodal,
-#             extract_images=settings.pdf_extract_images,
-#         )
-#         _shared_parser._evict_if_needed()
-#         _shared_parser._cache[file_hash] = docs
-#         logger.info("解析完成并缓存 | 文件: %s | 哈希: %s | 片段数: %d", file_path, file_hash[:12], len(docs))
-#
-#     return "\n\n".join(doc.page_content for doc in docs)
-#
-#
-# @tool
-# def parse_pdf_from_content(content: str) -> str:
-#     """从 base64 编码内容解析 PDF，返回解析后的纯文本内容。
-#
-#     解析配置（mode、table_strategy、enable_multimodal 等）从 settings 自动读取。
-#     同一内容（基于哈希判断）不会重复解析，直接返回缓存结果。
-#
-#     Args:
-#         content: base64 编码的 PDF 内容字符串
-#
-#     Returns:
-#         解析后的纯文本内容
-#     """
-#     pdf_bytes = _decode_content(content)
-#     content_hash = _compute_bytes_hash(pdf_bytes)
-#
-#     # 命中缓存
-#     if content_hash in _shared_parser._cache:
-#         logger.info("命中缓存，跳过解析 | 哈希: %s", content_hash[:12])
-#         docs = _shared_parser._cache[content_hash]
-#     else:
-#         tmp_path = None
-#         try:
-#             with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as tmp:
-#                 tmp.write(pdf_bytes)
-#                 tmp_path = tmp.name
-#
-#             docs = _do_parse_pdf_from_file(
-#                 tmp_path,
-#                 mode=settings.pdf_mode,
-#                 table_strategy=settings.pdf_table_strategy,
-#                 enable_multimodal=settings.enable_pdf_multimodal,
-#                 extract_images=settings.pdf_extract_images,
-#             )
-#         finally:
-#             if tmp_path and os.path.exists(tmp_path):
-#                 os.remove(tmp_path)
-#                 logger.debug("已清理临时文件: %s", tmp_path)
-#
-#         _shared_parser._evict_if_needed()
-#         _shared_parser._cache[content_hash] = docs
-#         logger.info("解析完成并缓存 | 哈希: %s | 片段数: %d", content_hash[:12], len(docs))
-#
-#     return "\n\n".join(doc.page_content for doc in docs)
-
-# pdfParser = PDFParser()
-# pdfParser.clear_cache()
+# 保持向后兼容的别名
+_compute_file_hash = compute_file_hash
+_compute_bytes_hash = compute_bytes_hash
+_decode_content = decode_content
