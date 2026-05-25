@@ -11,21 +11,25 @@ from app.tools.pdf_parse_tool import (
     clear_pdf_cache,
     get_cache_stats,
 )
-from app.tools.docling_pdf_tool import (
-    docling_parse_pdf_from_file,
-    docling_parse_pdf_from_content,
-    clear_docling_pdf_cache,
-    get_docling_cache_stats,
+
+# MCP 相关工具
+from app.tools.mcp_client_builder import (
+    MCPClientBuilder,
+    create_mcp_agent,
+    quick_mcp_agent,
+    create_pdf_mcp_client,
 )
 
 __all__ = [
+    # PDF 工具
     "parse_pdf_from_file",
     "parse_pdf_from_content",
     "parse_pdf_from_url",
     "clear_pdf_cache",
     "get_cache_stats",
-    "docling_parse_pdf_from_file",
-    "docling_parse_pdf_from_content",
-    "clear_docling_pdf_cache",
-    "get_docling_cache_stats",
+    # MCP 工具
+    "MCPClientBuilder",
+    "create_mcp_agent",
+    "quick_mcp_agent",
+    "create_pdf_mcp_client",
 ]
