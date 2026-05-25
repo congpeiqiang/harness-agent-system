@@ -14,10 +14,7 @@ from app.tools.pdf_parse_tool import (
 
 # MCP 相关工具
 from app.tools.mcp_client_builder import (
-    MCPClientBuilder,
-    create_mcp_agent,
-    quick_mcp_agent,
-    create_pdf_mcp_client,
+    MCPClientBuilder
 )
 
 __all__ = [
@@ -29,7 +26,4 @@ __all__ = [
     "get_cache_stats",
     # MCP 工具
     "MCPClientBuilder",
-    "create_mcp_agent",
-    "quick_mcp_agent",
-    "create_pdf_mcp_client",
 ]
