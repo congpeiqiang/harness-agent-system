@@ -75,84 +75,11 @@ async def test_tavily_search(
     logger.info(f"URL: {TAVILY_MCP_URL}")
     
     client = await builder.create_client()
-    async with client:
-        # 获取可用工具
-        tools = await client.get_tools()
-        logger.info(f"可用工具: {[t.name for t in tools]}")
-        
-        # 创建 Agent
-        agent = create_mcp_agent("deepseek-chat", tools)
-        
-        # 构建查询消息
-        search_request = f"""Search for: {query}
+    # 获取可用工具
+    tools = await client.get_tools()
+    logger.info(f"可用工具: {[t.name for t in tools]}")
 
-Parameters:
-- Max results: {max_results}
-- Search depth: {search_depth}
-- Include images: {include_images}
-- Include answer: {include_answer}
-
-Please perform the search and provide a comprehensive summary."""
-        
-        logger.info("执行搜索...")
-        result = await agent.ainvoke({
-            "messages": [{"role": "user", "content": search_request}]
-        })
-        
-        logger.info("=" * 60)
-        logger.info("搜索结果:")
-        logger.info("=" * 60)
-        logger.info(result)
-        
-        return result
-
-
-async def test_tavily_with_different_queries(api_key: str):
-    """使用不同的查询测试 Tavily"""
-    logger.info("=== Tavily 多查询测试 ===\n")
-    
-    queries = [
-        {
-            "query": "Latest Python 3.12 features",
-            "max_results": 3,
-            "search_depth": "basic",
-        },
-        {
-            "query": "LangChain MCP integration tutorial",
-            "max_results": 5,
-            "search_depth": "advanced",
-        },
-        {
-            "query": "Best practices for AI agent development 2025",
-            "max_results": 10,
-            "search_depth": "advanced",
-        },
-    ]
-    
-    builder = MCPClientBuilder()
-    tavily_url = f"{TAVILY_MCP_URL}?tavilyApiKey={api_key}"
-    builder.add_http_server(
-        name="tavily",
-        url=tavily_url,
-    )
-    
-    client = await builder.create_client()
-    async with client:
-        tools = await client.get_tools()
-        agent = create_mcp_agent("deepseek-chat", tools)
-        
-        for i, params in enumerate(queries, 1):
-            logger.info(f"\n--- 查询 {i}/{len(queries)} ---")
-            logger.info(f"查询: {params['query']}")
-            
-            result = await agent.ainvoke({
-                "messages": [{
-                    "role": "user",
-                    "content": f"Search for: {params['query']} with max_results={params['max_results']} and search_depth={params['search_depth']}"
-                }]
-            })
-            
-            logger.info(f"结果: {result}")
+    return result
 
 
 async def test_tavily_raw_tools(api_key: str, query: str):
@@ -240,13 +167,6 @@ async def main():
             max_results=args.max_results,
             search_depth=args.search_depth,
         )
-    
-    if args.mode in ("multi", "all"):
-        await test_tavily_with_different_queries(args.api_key)
-    
-    if args.mode in ("raw", "all"):
-        await test_tavily_raw_tools(args.api_key, args.query)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
