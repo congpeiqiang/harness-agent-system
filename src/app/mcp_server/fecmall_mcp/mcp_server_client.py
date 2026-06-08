@@ -2,7 +2,7 @@
 @File    :  mcp_server_client.py
 @Author  :  CongPeiQiang
 @Time    :  2026/6/8 21:57
-@Desc    :
+@Desc    :  
 """
 import asyncio
 import json
@@ -10,6 +10,7 @@ import logging
 from typing import Dict, Any, Optional
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from app.mcp_server.fecmall_mcp.config import FecMallConfig
+from app.tools.mcp_client_builder import fecmall_tools
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -75,7 +76,7 @@ class FecMallClient:
         return self._tool_map.get(name)
 
 # 示例使用
-async def fecmall_tool():
+async def fecmall_tools():
     """示例使用方法"""
     # 初始化配置和客户端
     config = FecMallConfig()
@@ -89,4 +90,4 @@ async def fecmall_tool():
         pass
 
 
-fecmall_tools = asyncio.run(fecmall_tool())
+asyncio.run(fecmall_tools())

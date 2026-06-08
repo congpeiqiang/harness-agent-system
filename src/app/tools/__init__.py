@@ -11,11 +11,7 @@ from app.tools.pdf_parse_tool import (
     clear_pdf_cache,
     get_cache_stats,
 )
-
-# MCP 相关工具
-from app.tools.mcp_client_builder import (
-    MCPClientBuilder
-)
+from app.tools.mcp_client_builder import fecmall_tools
 
 __all__ = [
     # PDF 工具
@@ -26,4 +22,5 @@ __all__ = [
     "get_cache_stats",
     # MCP 工具
     "MCPClientBuilder",
+    "fecmall_tools",
 ]

@@ -1,7 +1,7 @@
 """
 @File    :  agent.py
 @Author  :  CongPeiQiang
-@Time    :  2026/5/21 14:09
+@Time    :  2026/5/21 20:09
 @Desc    :  
 """
 # pip install -qU langchain "langchain[openai]"
@@ -15,6 +15,9 @@ import os
 from app.middleware.pdf_parse_middleware import PDFParseMiddleware
 from app.tools import parse_pdf_from_file, parse_pdf_from_content, parse_pdf_from_url
 from langchain.chat_models import init_chat_model
+from app.tools.mcp_client_builder import fecmall_tools
+import asyncio
+
 load_dotenv()
 
 def get_weather(city: str) -> str:
@@ -31,12 +34,24 @@ model = init_chat_model(os.getenv("VISION_MODEL"), model_provider=os.getenv("VIS
 
 agent = create_agent(
     model=model,
-    tools=[get_weather, parse_pdf_from_file, parse_pdf_from_content, parse_pdf_from_url],
+    tools=[
+        get_weather,
+        parse_pdf_from_file,
+        parse_pdf_from_content,
+        parse_pdf_from_url
+        ]+fecmall_tools,
     system_prompt="You are a helpful assistant",
-    middleware=[print_hook, PDFParseMiddleware()]
+    # middleware=[print_hook, PDFParseMiddleware()]
 )
 
 # result = agent.invoke(
 #     {"messages": [{"role": "user", "content": r"What's the weather in San Francisco?, 解析 D:\workspace\huice_008\harness-agent-system\src\app\resources\旅行日记.pdf"}]}
 # )
+
+result = asyncio.run(agent.ainvoke(
+    {"messages": [{"role": "user", "content": r"登录fecmall, email:1539397039@qq.com, password:123456"}]}
+))
 # print(result["messages"][-1].content_blocks)
+# print(result["messages"])
+for msg in result["messages"]:
+    msg.pretty_print()
