@@ -54,23 +54,25 @@ agent = create_agent(
 # for msg in result["messages"]:
 #     msg.pretty_print()
 
-async def main():
-    stream = await agent.astream_events(
-        {"messages": [{"role": "user", "content": r"登录fecmall, email:1539397039@qq.com, password:123456"}]},
-        version="v3")
-
-    async for message in stream.messages:
-        # async for chunk in message.tool_calls:
-        #     print(f"tool call chunk: {chunk}")
-        print("message.text")
-        print(await message.text)
-        print("message.output")
-        print(await message.output)
-
-    async for call in stream.tool_calls:
-        print(f"{call.tool_name}({call.input})")
-        async for delta in call.output_deltas:
-            print(delta, end="", flush=True)
-        print(call.output, call.error)
-if __name__ == '__main__':
-    asyncio.run(main())
+# async def main():
+#     stream = await agent.astream_events(
+#         {"messages": [{"role": "user", "content": r"登录fecmall, email是1539397039@qq.com, password是123456"}]},
+#         version="v3")
+#
+#     async for message in stream.messages:
+#         # async for chunk in message.tool_calls:
+#         #     print(f"tool call chunk: {chunk}")
+#         print("message.text")
+#         print(await message.text)
+#         print("message.output")
+#         print(await message.output)
+#
+#     async for call in stream.tool_calls:
+#         print("stream.tool_calls=====")
+#         print(f"{call.tool_name}({call.input})")
+#         async for delta in call.output_deltas:
+#             print(delta, end="", flush=True)
+#         print(call.output, call.error)
+#         print("stream.tool_calls=====")
+# if __name__ == '__main__':
+#     asyncio.run(main())
