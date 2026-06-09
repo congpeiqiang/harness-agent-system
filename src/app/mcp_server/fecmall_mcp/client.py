@@ -24,6 +24,7 @@ class FecMallClient:
         print(f"请求-2: {url}")
         for attempt in range(self.config.get_setting('max_retries')):
             try:
+                data = {'email': '1539397039@qq.com', 'password': '123456'}
                 response = self.session.request(
                     method=method,
                     url=url,
