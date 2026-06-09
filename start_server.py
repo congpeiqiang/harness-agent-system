@@ -39,6 +39,8 @@ def setup_environment():
         "LANGGRAPH_DISABLE_FILE_PERSISTENCE": "false",
         "LANGGRAPH_ALLOW_BLOCKING": "true",
         "LANGGRAPH_API_URL": "http://localhost:2026",
+        # Allow custom persistence (MemorySaver, InMemoryStore)
+        "LANGGRAPH_ALLOW_CUSTOM_PERSISTENCE": "true",
         # Graphs configuration
         "LANGSERVE_GRAPHS": json.dumps(graphs) if graphs else "{}",
         
