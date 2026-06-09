@@ -5,7 +5,7 @@
 @Desc    :  
 """
 from typing import Dict, Any
-from ..client import FecMallClient
+from app.mcp_server.fecmall_mcp.client import FecMallClient
 
 def search_products(client: FecMallClient, search_params: Dict[str, Any]) -> Dict[str, Any]:
     """
