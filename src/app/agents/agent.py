@@ -22,7 +22,7 @@ load_dotenv()
 
 def get_weather(city: str) -> str:
     """Get weather for a given city."""
-    return f"It's always sunny in {city}!"
+    return f"大到暴雨 {city}!"
 
 @before_model
 def print_hook(state: AgentState, runtime: Runtime):
@@ -41,7 +41,7 @@ agent = create_agent(
         parse_pdf_from_url
         ]+fecmall_tools,
     system_prompt="You are a helpful assistant",
-    # middleware=[print_hook, PDFParseMiddleware()]
+    middleware=[print_hook, PDFParseMiddleware()]
 )
 
 # result = agent.invoke(

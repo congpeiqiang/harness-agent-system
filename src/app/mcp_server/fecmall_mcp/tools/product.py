@@ -16,5 +16,5 @@ def search_products(client: FecMallClient, search_params: Dict[str, Any]) -> Dic
     Returns:
         Dict: 搜索结果
     """
-    endpoint = "product/search"
+    endpoint = "catalogsearch/index/index"
     return client.make_request("GET", endpoint, search_params)

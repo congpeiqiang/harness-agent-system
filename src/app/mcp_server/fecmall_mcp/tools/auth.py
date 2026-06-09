@@ -35,8 +35,8 @@ def customer_login(client: FecMallClient, access_token: str) -> Dict[str, Any]:
     Returns:
         Dict: 登录状态验证结果
     """
-    endpoint = "customer/login"
+    endpoint = "customer/login/index"
     data = {
         "access_token": access_token
     }
-    return client.make_request("POST", endpoint, data)
+    return client.make_request("GET", endpoint, data)
