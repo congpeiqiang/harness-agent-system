@@ -17,11 +17,12 @@ def customer_login_submit(client: FecMallClient, email: str, password: str) -> D
     Returns:
         Dict: 登录响应结果
     """
-    endpoint = "customer/login/submit"
+    endpoint = "customer/login/account"
     data = {
         "email": email,
         "password": password
     }
+    print(f"请求-1: {endpoint}")
     return client.make_request("POST", endpoint, data)
 
 def customer_login(client: FecMallClient, access_token: str) -> Dict[str, Any]:

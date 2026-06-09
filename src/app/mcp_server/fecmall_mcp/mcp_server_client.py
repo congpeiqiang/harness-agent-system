@@ -90,4 +90,5 @@ async def fecmall_tools():
         pass
 
 
-asyncio.run(fecmall_tools())
+tools = asyncio.run(fecmall_tools())
+print(tools)

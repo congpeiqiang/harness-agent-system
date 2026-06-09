@@ -30,7 +30,7 @@ def print_hook(state: AgentState, runtime: Runtime):
     print(state)
     return state
 
-model = init_chat_model(os.getenv("VISION_MODEL"), model_provider=os.getenv("VISION_MODEL_PROVIDER"), api_key=os.getenv("VISION_API_KEY"), base_url=os.getenv("VISION_BASE_URL"))
+model = init_chat_model(os.getenv("DEEPSEEK_MODEL"), model_provider=os.getenv("DEEPSEEK_MODEL_PROVIDER"), api_key=os.getenv("DEEPSEEK_API_KEY"), base_url=os.getenv("DEEPSEEK_BASE_URL"))
 
 agent = create_agent(
     model=model,
@@ -48,10 +48,29 @@ agent = create_agent(
 #     {"messages": [{"role": "user", "content": r"What's the weather in San Francisco?, 解析 D:\workspace\huice_008\harness-agent-system\src\app\resources\旅行日记.pdf"}]}
 # )
 
-result = asyncio.run(agent.ainvoke(
-    {"messages": [{"role": "user", "content": r"登录fecmall, email:1539397039@qq.com, password:123456"}]}
-))
-# print(result["messages"][-1].content_blocks)
-# print(result["messages"])
-for msg in result["messages"]:
-    msg.pretty_print()
+# result = asyncio.run(agent.ainvoke(
+#     {"messages": [{"role": "user", "content": r"登录fecmall, email:1539397036@qq.com, password:123456"}]}
+# ))
+# for msg in result["messages"]:
+#     msg.pretty_print()
+
+async def main():
+    stream = await agent.astream_events(
+        {"messages": [{"role": "user", "content": r"登录fecmall, email:1539397039@qq.com, password:123456"}]},
+        version="v3")
+
+    async for message in stream.messages:
+        # async for chunk in message.tool_calls:
+        #     print(f"tool call chunk: {chunk}")
+        print("message.text")
+        print(await message.text)
+        print("message.output")
+        print(await message.output)
+
+    async for call in stream.tool_calls:
+        print(f"{call.tool_name}({call.input})")
+        async for delta in call.output_deltas:
+            print(delta, end="", flush=True)
+        print(call.output, call.error)
+if __name__ == '__main__':
+    asyncio.run(main())

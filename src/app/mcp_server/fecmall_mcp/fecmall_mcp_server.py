@@ -27,6 +27,7 @@ mcp = FastMCP("FecMall MCP Server")
 
 # 初始化配置和客户端
 config = FecMallConfig()
+print(f"config: {config}")
 client = FecMallClient(config)
 
 @mcp.tool()
@@ -40,6 +41,7 @@ def customer_login_submit_tool(email: str, password: str) -> str:
         str: 登录响应结果
     """
     try:
+        print(f"customer_login_submit_tool-1: {client}, {email}, {password}")
         result = customer_login_submit(client, email, password)
         return json.dumps(result, ensure_ascii=False)
     except Exception as e:
