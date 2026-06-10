@@ -102,5 +102,5 @@ async def get_all_tools():
         pass
 
 
-all_tools = asyncio.run(get_all_tools())
-print(all_tools)
+mcp_tools = asyncio.run(get_all_tools())
+print(mcp_tools)
