@@ -14,7 +14,7 @@ from langchain.agents import AgentState
 from langgraph.runtime import Runtime
 import os
 from app.middleware.pdf_parse_middleware import PDFParseMiddleware
-from langchain.agents.middleware import HumanInTheLoopMiddleware
+from langchain.agents.middleware import HumanInTheLoopMiddleware, ToolCallLimitMiddleware
 from app.tools import parse_pdf_from_file, parse_pdf_from_content, parse_pdf_from_url
 from langchain.chat_models import init_chat_model
 from app.tools.mcp_client_builder import fecmall_tools
@@ -77,8 +77,7 @@ toolCallLimitMiddleware = [
         ToolCallLimitMiddleware(
             thread_limit=20, run_limit=3
         )
-    ],
-
+    ]
 model = init_chat_model(os.getenv("DEEPSEEK_MODEL"), model_provider=os.getenv("DEEPSEEK_MODEL_PROVIDER"), api_key=os.getenv("DEEPSEEK_API_KEY"), base_url=os.getenv("DEEPSEEK_BASE_URL"))
 
 # 自定义 persistence 组件（需在 start_server.py 中设置 LANGGRAPH_ALLOW_CUSTOM_PERSISTENCE=true）
@@ -98,7 +97,6 @@ agent = create_agent(
         ]+fecmall_tools,
     system_prompt="You are a helpful assistant",
     middleware=[print_hook, PDFParseMiddleware()]+humanInTheLoopMiddleware+toolCallLimitMiddleware,
-    # middleware=humanInTheLoopMiddleware,
     checkpointer=checkpointer,
     store=store,
 )
