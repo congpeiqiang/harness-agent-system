@@ -17,7 +17,7 @@ from app.middleware.pdf_parse_middleware import PDFParseMiddleware
 from langchain.agents.middleware import HumanInTheLoopMiddleware, ToolCallLimitMiddleware
 from app.tools import parse_pdf_from_file, parse_pdf_from_content, parse_pdf_from_url
 from langchain.chat_models import init_chat_model
-from app.tools.mcp_client_builder import fecmall_tools
+from app.tools.mcp_client_builder import mcp_tools
 from langgraph.types import Command
 import asyncio
 
@@ -94,7 +94,7 @@ agent = create_agent(
         parse_pdf_from_file,
         parse_pdf_from_content,
         parse_pdf_from_url
-        ]+fecmall_tools,
+        ]+mcp_tools,
     system_prompt="You are a helpful assistant",
     middleware=[print_hook, PDFParseMiddleware()]+humanInTheLoopMiddleware+toolCallLimitMiddleware,
     checkpointer=checkpointer,
