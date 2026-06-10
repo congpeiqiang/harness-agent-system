@@ -10,13 +10,16 @@ import logging
 from typing import Dict, Any, Optional
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from app.mcp_server.fecmall_mcp.config import FecMallConfig
+import os
+from dotenv import load_dotenv
+load_dotenv()
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-class FecMallClient:
+class MCPClient:
     def __init__(self, config: FecMallConfig):
         """
         初始化FecMall客户端
@@ -24,12 +27,22 @@ class FecMallClient:
             config: FecMall配置对象
         """
         self.config = config
+        TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
         self.mcp_client = MultiServerMCPClient(
             {
                 "fecmall-mcp": {
                     "url": self.config.get_setting('mcp_url', 'http://127.0.0.1:8000/sse'),
                     "transport": self.config.get_setting('mcp_transport', 'sse'),
-                }
+                },
+                "tavily-mcp": {
+                    "transport": "stdio",
+                    "command": "npx",
+                      "args": ["-y", "tavily-mcp@latest"],
+                      "env": {
+                        "TAVILY_API_KEY": TAVILY_API_KEY,
+                        "DEFAULT_PARAMETERS": "{\"include_images\": true, \"max_results\": 15, \"search_depth\": \"advanced\"}"
+      }
+    }
             }
         )
         self._tool_map = {}
@@ -75,11 +88,11 @@ class FecMallClient:
         return self._tool_map.get(name)
 
 # 示例使用
-async def fecmall_tool():
+async def get_all_tools():
     """示例使用方法"""
     # 初始化配置和客户端
     config = FecMallConfig()
-    client = FecMallClient(config)
+    client = MCPClient(config)
     try:
         # 初始化客户端
         await client.initialize()
@@ -89,4 +102,5 @@ async def fecmall_tool():
         pass
 
 
-fecmall_tools = asyncio.run(fecmall_tool())
+all_tools = asyncio.run(get_all_tools())
+print(all_tools)
