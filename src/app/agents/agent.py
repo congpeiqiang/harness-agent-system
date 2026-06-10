@@ -31,7 +31,7 @@ def get_weather(city: str) -> str:
 def print_hook(state: AgentState, runtime: Runtime):
     print("Before calling model")
     print(state)
-    # 更安全的方式（防止属性不存在）
+    # 安全的方式（防止属性不存在）
     execution_info = getattr(runtime, "execution_info", None)
     server_info = getattr(runtime, "server_info", None)
     if execution_info:
@@ -45,7 +45,7 @@ def print_hook(state: AgentState, runtime: Runtime):
     print(f"Thread ID: {thread_id}\nAssistant ID: {assistant_id}")
     return state
 
-humanInTheLoopMiddleware=[
+humanInTheLoopMiddleware = [
         HumanInTheLoopMiddleware(
             interrupt_on={
                 "customer_login_submit_tool": {
@@ -54,12 +54,30 @@ humanInTheLoopMiddleware=[
                 "submit_register_tool": {
                     "allowed_decisions": ["approve", "edit", "reject"],
                 },
-                "get_register_info_tool": {
+                "paypal_express_start_tool": {
+                    "allowed_decisions": ["approve", "edit", "reject"],
+                },
+                "paypal_express_submit_tool": {
+                    "allowed_decisions": ["approve", "edit", "reject"],
+                },
+                "paypal_standard_start_tool": {
+                    "allowed_decisions": ["approve", "edit", "reject"],
+                },
+                "checkmoney_start_tool": {
                     "allowed_decisions": ["approve", "edit", "reject"],
                 },
             }
         )
     ]
+
+toolCallLimitMiddleware = [
+        # Global limit
+        # thread_limit:每个线程允许的最大工具调用数。 None 表示没有限制
+        # run_limit:每次运行允许的最大工具调用次数。 None 表示没有限制
+        ToolCallLimitMiddleware(
+            thread_limit=20, run_limit=3
+        )
+    ],
 
 model = init_chat_model(os.getenv("DEEPSEEK_MODEL"), model_provider=os.getenv("DEEPSEEK_MODEL_PROVIDER"), api_key=os.getenv("DEEPSEEK_API_KEY"), base_url=os.getenv("DEEPSEEK_BASE_URL"))
 
@@ -79,8 +97,8 @@ agent = create_agent(
         parse_pdf_from_url
         ]+fecmall_tools,
     system_prompt="You are a helpful assistant",
-    # middleware=[print_hook, PDFParseMiddleware()],
-    middleware=humanInTheLoopMiddleware,
+    middleware=[print_hook, PDFParseMiddleware()]+humanInTheLoopMiddleware+toolCallLimitMiddleware,
+    # middleware=humanInTheLoopMiddleware,
     checkpointer=checkpointer,
     store=store,
 )
@@ -110,7 +128,7 @@ agent = create_agent(
 
 # async def main():
 #     stream = await agent.astream_events(
-#         {"messages": [{"role": "user", "content": r"登录fecmall, email是1539397039@qq.com, password是123456"}]},
+#         {"messages": [{"role": "user", "content": r"登录fecmall, email是1539397036@qq.com, password是123456"}]},
 #         version="v3")
 #
 #     async for message in stream.messages:
