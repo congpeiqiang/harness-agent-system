@@ -10,7 +10,6 @@ import logging
 from typing import Dict, Any, Optional
 from langchain_mcp_adapters.client import MultiServerMCPClient
 from app.mcp_server.fecmall_mcp.config import FecMallConfig
-from app.tools.mcp_client_builder import fecmall_tools
 
 # 配置日志
 logging.basicConfig(level=logging.INFO)
@@ -76,7 +75,7 @@ class FecMallClient:
         return self._tool_map.get(name)
 
 # 示例使用
-async def fecmall_tools():
+async def mcp_tools():
     """示例使用方法"""
     # 初始化配置和客户端
     config = FecMallConfig()
@@ -90,5 +89,5 @@ async def fecmall_tools():
         pass
 
 
-tools = asyncio.run(fecmall_tools())
+tools = asyncio.run(mcp_tools())
 print(tools)
