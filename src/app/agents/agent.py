@@ -201,7 +201,7 @@ async def astream_demo():
             print(chunk["data"]["__interrupt__"])
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     # from langgraph.checkpoint.memory import MemorySaver
     # from langgraph.store.memory import InMemoryStore
     #
@@ -225,4 +225,4 @@ if __name__ == '__main__':
     # for msg in result["messages"]:
     #     msg.pretty_print()
 
-    asyncio.run(astream_demo())
+    # asyncio.run(astream_demo())

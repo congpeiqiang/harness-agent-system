@@ -5,17 +5,19 @@ from pydantic import BaseModel, Field
 
 
 class InvokeRequest(BaseModel):
-    """Request body for /invoke."""
+    """Request body for /invoke and /ainvoke."""
 
     messages: list[dict[str, Any]] = Field(default_factory=list)
     config: dict[str, Any] = Field(default_factory=dict)
+    context: dict[str, Any] = Field(default_factory=dict)
 
 
 class StreamRequest(BaseModel):
-    """Request body for /stream."""
+    """Request body for /stream and /astream."""
 
     messages: list[dict[str, Any]] = Field(default_factory=list)
     config: dict[str, Any] = Field(default_factory=dict)
+    context: dict[str, Any] = Field(default_factory=dict)
 
 
 class BatchRequest(BaseModel):
