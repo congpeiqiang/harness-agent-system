@@ -49,7 +49,7 @@ class TestAgentEndpoints:
     def test_invoke_no_auth(self, client):
         """测试无认证调用 /invoke。"""
         response = client.post(
-            "/invoke",
+            "/agent/invoke",
             json={"messages": [{"role": "user", "content": "你好"}]},
         )
         # 可能返回 403（需要 API_KEY）或 500（Agent 未初始化）
@@ -58,7 +58,7 @@ class TestAgentEndpoints:
     def test_stream_no_auth(self, client):
         """测试无认证调用 /stream。"""
         response = client.post(
-            "/stream",
+            "/agent/stream",
             json={"messages": [{"role": "user", "content": "你好"}]},
         )
         assert response.status_code in [403, 500]
