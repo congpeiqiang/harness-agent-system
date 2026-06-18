@@ -89,6 +89,9 @@ harness-agent-system/
 | `DEEPSEEK_API_KEY` | DeepSeek API 密钥 | - |
 | `VISION_API_KEY` | 火山引擎 API 密钥 | - |
 | `API_KEY` | API 认证密钥 | - |
+| `QWEN_API_KEY` | 通义千问 API 密钥 | - |
+| `QWEN_BASE_URL` | 通义千问 API 地址 | https://dashscope.aliyuncs.com/compatible-mode/v1 |
+| `QWEN_MODEL` | 通义千问模型 | qwen3.6-35b-a3b |
 | `LOG_LEVEL` | 日志级别 | INFO |
 | `SERVER_PORT` | 服务端口 | 2026 |
 

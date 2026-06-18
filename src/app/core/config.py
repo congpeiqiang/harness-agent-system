@@ -32,6 +32,8 @@ class AISettings(BaseSettings):
     """AI 模型相关配置。"""
 
     model_config = SettingsConfigDict(
+        env_file=get_project_root() / ".env",
+        env_file_encoding="utf-8",
         env_prefix="",
         case_sensitive=False,
         extra="ignore",
@@ -69,6 +71,14 @@ class AISettings(BaseSettings):
     openai_base_url: Optional[str] = Field(default=None, description="OpenAI API 基础 URL")
     openai_model: Optional[str] = Field(default=None, description="OpenAI 模型名称")
 
+    # Qwen (通义千问) 配置
+    qwen_api_key: Optional[str] = Field(default=None, description="Qwen API Key")
+    qwen_base_url: str = Field(
+        default="https://dashscope.aliyuncs.com/compatible-mode/v1",
+        description="Qwen API 基础 URL",
+    )
+    qwen_model: str = Field(default="qwen3.6-35b-a3b", description="Qwen 模型名称")
+
     # PDF 解析器配置
     enable_pdf_multimodal: bool = Field(default=False, description="是否开启 PDF 多模态解析")
     pdf_mode: str = Field(default="single", description="PDF 解析模式（single 或 page）")
@@ -83,6 +93,8 @@ class LoggingSettings(BaseSettings):
     """日志相关配置。"""
 
     model_config = SettingsConfigDict(
+        env_file=get_project_root() / ".env",
+        env_file_encoding="utf-8",
         env_prefix="",
         case_sensitive=False,
         extra="ignore",
@@ -106,6 +118,8 @@ class SecuritySettings(BaseSettings):
     """安全相关配置。"""
 
     model_config = SettingsConfigDict(
+        env_file=get_project_root() / ".env",
+        env_file_encoding="utf-8",
         env_prefix="",
         case_sensitive=False,
         extra="ignore",
@@ -200,6 +214,22 @@ class Settings(BaseSettings):
         """获取 OpenAI API Key。"""
         return os.getenv("OPENAI_API_KEY") or self.ai.openai_api_key
 
+
+    @property
+    def qwen_api_key(self) -> Optional[str]:
+        """获取 Qwen API Key。"""
+        return os.getenv("QWEN_API_KEY") or self.ai.qwen_api_key
+
+    @property
+    def qwen_base_url(self) -> str:
+        """获取 Qwen 基础 URL。"""
+        return self.ai.qwen_base_url
+
+    @property
+    def qwen_model(self) -> str:
+        """获取 Qwen 模型名称。"""
+        return self.ai.qwen_model
+
     # --- PDF 便捷属性 ---
 
     @property
@@ -279,6 +309,9 @@ class Settings(BaseSettings):
             "VISION_MODEL": self.vision_model,
             "VISION_TEXT_MODEL": self.vision_text_model,
             "OPENAI_API_KEY": self.openai_api_key or "",
+            "QWEN_API_KEY": self.qwen_api_key or "",
+            "QWEN_BASE_URL": self.qwen_base_url,
+            "QWEN_MODEL": self.qwen_model,
             "ENABLE_PDF_MULTIMODAL": str(self.enable_pdf_multimodal),
             "PDF_MODE": self.pdf_mode,
             "PDF_TABLE_STRATEGY": self.pdf_table_strategy,
