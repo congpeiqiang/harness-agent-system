@@ -77,8 +77,11 @@ class PDFParseMiddleware(AgentMiddleware):
             return handler(request)
 
         # 获取thread_id并创建目录结构: uploads/{thread_id}/pdf
-        thread_id = self._extract_thread_id(request)
-        logger.info(f"处理线程ID: {thread_id}")
+        # thread_id = self._extract_thread_id(request)
+        context = request.runtime.context
+        user_id = context.get("user_id", None)
+        thread_id = context.get("thread_id", None)
+        logger.info(f"user_id: {user_id}; thread_id: {thread_id}")
 
         # 创建thread_id专属目录结构
         thread_dir = Path(f"uploads/{thread_id}/pdf")

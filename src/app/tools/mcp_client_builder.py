@@ -88,7 +88,7 @@ class MCPClient:
         return self._tool_map.get(name)
 
 # 示例使用
-async def get_all_tools():
+async def get_mcp_tools_async():
     """示例使用方法"""
     # 初始化配置和客户端
     config = FecMallConfig()
@@ -102,5 +102,4 @@ async def get_all_tools():
         pass
 
 
-mcp_tools = asyncio.run(get_all_tools())
-print(mcp_tools)
+# mcp_tools = asyncio.create_task(get_all_tools())

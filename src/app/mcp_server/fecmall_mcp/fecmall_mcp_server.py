@@ -7,6 +7,7 @@
 from fastmcp import FastMCP
 from typing import Dict, Any
 import json
+
 from app.mcp_server.fecmall_mcp import (
     FecMallConfig,
     FecMallClient,
@@ -73,6 +74,7 @@ from app.mcp_server.fecmall_mcp import (
     # Customer Review
     get_customer_reviews,
 )
+from langgraph.config import get_stream_writer
 
 # 创建FastMCP实例
 mcp = FastMCP("FecMall MCP Server")
@@ -96,7 +98,6 @@ def customer_login_submit_tool(email: str, password: str) -> str:
         str: 登录响应结果
     """
     try:
-        print(f"customer_login_submit_tool-1: {client}, {email}, {password}")
         result = customer_login_submit(client, email, password)
         return json.dumps(result, ensure_ascii=False)
     except Exception as e:

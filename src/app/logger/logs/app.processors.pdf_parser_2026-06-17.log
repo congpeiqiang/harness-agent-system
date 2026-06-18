@@ -1,0 +1,2 @@
+2026-06-17 21:21:55 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-17 21:23:54 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128

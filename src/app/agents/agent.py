@@ -2,36 +2,36 @@
 @File    :  agent.py
 @Author  :  CongPeiQiang
 @Time    :  2026/5/21 20:09
-@Desc    :  
+@Desc    :  Agent factory with pluggable checkpointer / store.
 """
-# pip install -qU langchain "langchain[openai]"
-# from langchain.agents import create_agent
-from deepagents import create_deep_agent as create_agent
+import time
 
+from langchain.agents import create_agent
 from dotenv import load_dotenv
 from langchain.agents.middleware import before_model
 from langchain.agents import AgentState
 from langgraph.runtime import Runtime
 import os
+from watchfiles import awatch
 from app.middleware.pdf_parse_middleware import PDFParseMiddleware
-from langchain.agents.middleware import HumanInTheLoopMiddleware, ToolCallLimitMiddleware
+from langchain.agents.middleware import HumanInTheLoopMiddleware, ToolCallLimitMiddleware, SummarizationMiddleware, ModelFallbackMiddleware
+from deepagents.backends.filesystem import FilesystemBackend
+from deepagents.middleware.skills import SkillsMiddleware
 from app.tools import parse_pdf_from_file, parse_pdf_from_content, parse_pdf_from_url
+from app.tools import get_weather, read_file, get_weather_async
 from langchain.chat_models import init_chat_model
-from app.tools.mcp_client_builder import mcp_tools
+from app.tools.mcp_client_builder import get_mcp_tools_async
 from langgraph.types import Command
 import asyncio
+from app.core.state import CustomState, ContextState
 
 load_dotenv()
 
-def get_weather(city: str) -> str:
-    """Get weather for a given city."""
-    return f"大到暴雨 {city}!"
 
 @before_model
 def print_hook(state: AgentState, runtime: Runtime):
     print("Before calling model")
     print(state)
-    # 安全的方式（防止属性不存在）
     execution_info = getattr(runtime, "execution_info", None)
     server_info = getattr(runtime, "server_info", None)
     if execution_info:
@@ -39,110 +39,190 @@ def print_hook(state: AgentState, runtime: Runtime):
     else:
         thread_id = "unknown"
     if server_info:
-        assistant_id = getattr(server_info, "assistant_id", "unknown")  # ← 助手ID
+        assistant_id = getattr(server_info, "assistant_id", "unknown")
     else:
         assistant_id = "unknown"
     print(f"Thread ID: {thread_id}\nAssistant ID: {assistant_id}")
     return state
 
+
 humanInTheLoopMiddleware = [
-        HumanInTheLoopMiddleware(
-            interrupt_on={
-                "customer_login_submit_tool": {
-                    "allowed_decisions": ["approve", "edit", "reject"],
-                },
-                "submit_register_tool": {
-                    "allowed_decisions": ["approve", "edit", "reject"],
-                },
-                "paypal_express_start_tool": {
-                    "allowed_decisions": ["approve", "edit", "reject"],
-                },
-                "paypal_express_submit_tool": {
-                    "allowed_decisions": ["approve", "edit", "reject"],
-                },
-                "paypal_standard_start_tool": {
-                    "allowed_decisions": ["approve", "edit", "reject"],
-                },
-                "checkmoney_start_tool": {
-                    "allowed_decisions": ["approve", "edit", "reject"],
-                },
-            }
-        )
-    ]
+    HumanInTheLoopMiddleware(
+        interrupt_on={
+            "customer_login_submit_tool": {
+                "allowed_decisions": ["approve", "edit", "reject"],
+            },
+            "submit_register_tool": {
+                "allowed_decisions": ["approve", "edit", "reject"],
+            },
+            "paypal_express_start_tool": {
+                "allowed_decisions": ["approve", "edit", "reject"],
+            },
+            "paypal_express_submit_tool": {
+                "allowed_decisions": ["approve", "edit", "reject"],
+            },
+            "paypal_standard_start_tool": {
+                "allowed_decisions": ["approve", "edit", "reject"],
+            },
+            "checkmoney_start_tool": {
+                "allowed_decisions": ["approve", "edit", "reject"],
+            },
+        }
+    )
+]
 
 toolCallLimitMiddleware = [
-        # Global limit
-        # thread_limit:每个线程允许的最大工具调用数。 None 表示没有限制
-        # run_limit:每次运行允许的最大工具调用次数。 None 表示没有限制
-        ToolCallLimitMiddleware(
-            thread_limit=20, run_limit=3
-        )
-    ]
-model = init_chat_model(os.getenv("DEEPSEEK_MODEL"), model_provider=os.getenv("DEEPSEEK_MODEL_PROVIDER"), api_key=os.getenv("DEEPSEEK_API_KEY"), base_url=os.getenv("DEEPSEEK_BASE_URL"))
+    ToolCallLimitMiddleware(
+        tool_name="get_weather_async",
+        thread_limit=20,
+        run_limit=3
+    ),
+    # ToolCallLimitMiddleware(
+    #     tool_name="get_weather",
+    #     thread_limit=20,
+    #     run_limit=3
+    # )
+]
 
-# 自定义 persistence 组件（需在 start_server.py 中设置 LANGGRAPH_ALLOW_CUSTOM_PERSISTENCE=true）
-from langgraph.checkpoint.memory import MemorySaver
-from langgraph.store.memory import InMemoryStore
+model = init_chat_model(
+    os.getenv("DEEPSEEK_MODEL"),
+    model_provider=os.getenv("DEEPSEEK_MODEL_PROVIDER"),
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
+    base_url=os.getenv("DEEPSEEK_BASE_URL")
+)
 
-checkpointer = MemorySaver()
-store = InMemoryStore()
+backend = FilesystemBackend(
+    root_dir="/code_work_space/llm/huice/008/harness-agent-system/src/app/workspace/skills",
+    virtual_mode=True
+)
+skillsMiddleware = SkillsMiddleware(
+    backend=backend,
+    sources=["./fecmall_skills"],
+)
 
-agent = create_agent(
-    model=model,
-    tools=[
+from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
+from langgraph.store.sqlite import AsyncSqliteStore
+
+async def async_init_checkpointer_store():
+    import aiosqlite
+    # 方式二: 直接初始化（需要手动管理连接）
+    conn = await aiosqlite.connect(r"D:\code_work_space\llm\huice\008\harness-agent-system\checkpoints.sqlite")
+    saver = AsyncSqliteSaver(conn)
+    store = AsyncSqliteStore(conn)
+    return saver, store
+
+# 等待 MCP 工具初始化完成
+def get_all_tools():
+    tools = [
         get_weather,
         parse_pdf_from_file,
         parse_pdf_from_content,
         parse_pdf_from_url
-        ]+mcp_tools,
-    system_prompt="You are a helpful assistant",
-    middleware=[print_hook, PDFParseMiddleware()]+humanInTheLoopMiddleware+toolCallLimitMiddleware,
-    checkpointer=checkpointer,
-    store=store,
-)
+    ]
+    mcp_tools = asyncio.run(get_mcp_tools_async())
+    tools.extend(mcp_tools)
+    return tools
 
-# result = agent.invoke(
-#     {"messages": [{"role": "user", "content": r"What's the weather in San Francisco?, 解析 D:\workspace\huice_008\harness-agent-system\src\app\resources\旅行日记.pdf"}]}
-# )
+async def get_all_tools_async():
+    tools = [
+        get_weather,
+        parse_pdf_from_file,
+        parse_pdf_from_content,
+        parse_pdf_from_url
+    ]
+    # mcp_tools = asyncio.run(get_mcp_tools_async())
+    mcp_tools = await get_mcp_tools_async()
+    tools.extend(mcp_tools)
+    return tools
 
-# 人机交互
-# config = {"configurable": {"thread_id": "thread_id-111"}}
-# result = asyncio.run(agent.ainvoke(
-#     {"messages": [{"role": "user", "content": r"登录fecmall, email:1539397036@qq.com, password:123456"}]},
-#     config=config,
-#     version="v2",
-# ))
-# print(result.interrupts)
-# result = asyncio.run(agent.ainvoke(
-#     Command(
-#         resume={"decisions": [{"type": "reject"}]}  # or "reject"
-#     ),
-#     config=config, # Same thread ID to resume the paused conversation
-#     version="v2",
-# ))
-# print(result)
-# for msg in result["messages"]:
-#     msg.pretty_print()
 
-# async def main():
-#     stream = await agent.astream_events(
-#         {"messages": [{"role": "user", "content": r"登录fecmall, email是1539397036@qq.com, password是123456"}]},
-#         version="v3")
+# tools = get_all_tools()
 #
-#     async for message in stream.messages:
-#         # async for chunk in message.tool_calls:
-#         #     print(f"tool call chunk: {chunk}")
-#         print("message.text")
-#         print(await message.text)
-#         print("message.output")
-#         print(await message.output)
-#
-#     async for call in stream.tool_calls:
-#         print("stream.tool_calls=====")
-#         print(f"{call.tool_name}({call.input})")
-#         async for delta in call.output_deltas:
-#             print(delta, end="", flush=True)
-#         print(call.output, call.error)
-#         print("stream.tool_calls=====")
-# if __name__ == '__main__':
-#     asyncio.run(main())
+# agent = create_agent(
+#         model=model,
+#         state_schema=CustomState,
+#         context_schema=ContextState,
+#         tools=tools,
+#         system_prompt="You are a helpful assistant",
+#         middleware=[
+#             print_hook,
+#             PDFParseMiddleware(),
+#             ModelFallbackMiddleware(os.getenv("DEEPSEEK_MODEL"), os.getenv("DEEPSEEK_MODEL")),
+#             *humanInTheLoopMiddleware,
+#             *toolCallLimitMiddleware
+#         ]
+#     )
+
+
+
+
+async def build_agent(checkpointer, store):
+    """Build and return an agent instance with the given persistence layers."""
+    tools = await  get_all_tools_async()
+    return create_agent(
+        model=model,
+        state_schema=CustomState,
+        context_schema=ContextState,
+        tools=tools,
+        system_prompt="You are a helpful assistant",
+        middleware=[
+            print_hook,
+            PDFParseMiddleware(),
+            ModelFallbackMiddleware(os.getenv("DEEPSEEK_MODEL"), os.getenv("DEEPSEEK_MODEL")),
+            *humanInTheLoopMiddleware,
+            *toolCallLimitMiddleware
+        ],
+        checkpointer=checkpointer,
+        store=store,
+    )
+
+
+async def astream_demo():
+    from langgraph.checkpoint.memory import MemorySaver
+    from langgraph.store.memory import InMemoryStore
+
+    cp = MemorySaver()
+    st = InMemoryStore()
+    agent = await build_agent(cp, st)
+    config = {"configurable": {"thread_id": "thread_id-111"}}
+    async for chunk in agent.astream(
+        # {"messages": [{"role": "user", "content": r"登录fecmall, email是1539397036@qq.com, password是123456"}]},
+        {"messages": [{"role": "user", "content": r"无锡天气？"}]},
+        config=config,
+        context=ContextState(
+                    user_id="user_id_111",
+                    thread_id="thread_id_111",
+                ),
+        stream_mode="values",
+        version="v2"
+    ):
+        print(chunk)
+        if "__interrupt__" in chunk["data"]:
+            print(chunk["data"]["__interrupt__"])
+
+
+if __name__ == '__main__':
+    # from langgraph.checkpoint.memory import MemorySaver
+    # from langgraph.store.memory import InMemoryStore
+    #
+    # cp = MemorySaver()
+    # st = InMemoryStore()
+    # agent = build_agent(cp, st)
+
+    # result = agent.ainvoke(
+    #     {
+    #         "messages": [{"role": "user", "content": r"无锡天气?"}],
+    #         "question":"无锡天气?"
+    #     },
+    #     config={"configurable": {"thread_id": "thread_id_111"}},
+    #     context=ContextState(
+    #         user_id="user_id_111",
+    #         thread_id="thread_id_111",
+    #     )
+    # )
+    # print("======result======")
+    # print(result)
+    # for msg in result["messages"]:
+    #     msg.pretty_print()
+
+    asyncio.run(astream_demo())

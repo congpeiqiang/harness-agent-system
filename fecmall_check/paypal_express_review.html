@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-control" content="no-cache">
+    <meta http-equiv="expires" content="0">  
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="language" content="en" />
+        <link href="./assets/ff4688ed/css/bootstrap.css" rel="stylesheet">
+<link href="./assets/4ce3a7f/solarized_light.css" rel="stylesheet">
+<link href="./assets/2216dd45/style.css" rel="stylesheet">
+<script src="./assets/44f0ec7a/jquery.js"></script>
+<script src="./assets/ff4688ed/js/bootstrap.js"></script>
+<script src="./assets/7306ce96/jssearch.js"></script>    <title>Api- Cart Paypal Express Review - Fecmall Appserver 入口 - FecShop Guide</title>
+
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "https://hm.baidu.com/hm.js?c9025b577c7ba816d9db07ebe8803fab";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+
+</head>
+
+<style>
+table{
+    width:100%;
+    margin:15px 0;
+}
+table tr th{border-bottom:2px solid #ccc;padding:4px 5px;}
+table tr td{border-bottom:1px solid #ccc;padding:4px 5px;}
+blockquote {
+    font-size: 14px;
+    border-left-color: #e5e5e5;
+    background-color: #f0f0f0;
+}
+
+h2, .h2 {
+    font-size: 30px;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.3em;
+    font-size: 1.5em;
+    margin:2em 0;
+}
+
+h4{
+margin-top:2em;
+}
+</style>
+
+
+<body>
+
+<div class="wrap">
+<div class="container-body">
+    <nav id="w1987" class="navbar-inverse navbar-fixed-top navbar" role="navigation"><div class="navbar-header"><button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#w1987-collapse"><span class="sr-only">Toggle navigation</span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span>
+<span class="icon-bar"></span></button><a class="navbar-brand" href="http://www.fecmall.com">Fecmall</a></div><div id="w1987-collapse" class="collapse navbar-collapse"><ul id="w1988" class="navbar-nav nav"><li><a href="./guide-README.html">Guide</a></li></ul><div class="navbar-form navbar-left" role="search">
+  <div class="form-group">
+    <input id="searchbox" type="text" class="form-control" placeholder="Search">
+  </div>
+</div>
+</div></nav>
+    <div id="search-resultbox" style="display: none;" class="modal-content">
+        <ul id="search-results">
+        </ul>
+    </div>
+
+    
+<div class="row">
+    <div class="col-md-2">
+                <div id="navigation" class="list-group"><a class="list-group-item" href="#navigation-1976" data-toggle="collapse" data-parent="#navigation">关于与安装 <b class="caret"></b></a><div id="navigation-1976" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecshop-2-about-description.html">Fecmall-2.x 介绍</a>
+<a class="list-group-item" href="./guide-fecshop-2-graphical-install.html">Fecmall-2.x 安装</a>
+<a class="list-group-item" href="./guide-fecshop-2-3-about-wamp-install.html">Fecmall-2.x Win10本地-WAMP安装</a>
+<a class="list-group-item" href="./guide-fecshop-2-graphical-bt-install.html">Fecmall-2.x 宝塔安装</a>
+<a class="list-group-item" href="./guide-fecshop-2-graphical-web-install.html">Fecmall-2.x 界面安装</a>
+<a class="list-group-item" href="./guide-fecshop-2-graphical-ssl-https.html">Fecmall-2.x SSL证书 - HTTPS</a>
+<a class="list-group-item" href="./guide-fecshop-2-about-update.html">Fecmall-2.x 升级</a>
+<a class="list-group-item" href="./guide-fecshop-2-vue-install.html">Fecmall-2.x 安装VUE</a>
+<a class="list-group-item" href="./guide-fecshop-2-weixin-install.html">Fecmall-2.x 安装微信小程序</a>
+<a class="list-group-item" href="./guide-fecshop-2-1-diff.html">Fecmall-2和1版本差异</a></div>
+<a class="list-group-item" href="#navigation-1977" data-toggle="collapse" data-parent="#navigation">Fecmall 结构与初始化 <b class="caret"></b></a><div id="navigation-1977" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecmall-construct-framework.html">Fecmall 架构简叙</a>
+<a class="list-group-item" href="./guide-fecmall-init-config-construction.html">Fecmall 配置结构</a>
+<a class="list-group-item" href="./guide-fecmall-init-func.html">Fecmall 初始化（全）</a>
+<a class="list-group-item" href="./guide-fecmall-init-index.html">Fecmall 1.index.php初始化</a>
+<a class="list-group-item" href="./guide-fecmall-init-store.html">Fecmall 2.Store初始化</a>
+<a class="list-group-item" href="./guide-fecmall-init-request-url.html">Fecmall 3.Request Url初始化</a></div>
+<a class="list-group-item" href="#navigation-1978" data-toggle="collapse" data-parent="#navigation">Fecmall Appfront和Apphtml5 <b class="caret"></b></a><div id="navigation-1978" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecmall-appfront-about.html">Fecmall front 关于和介绍</a>
+<a class="list-group-item" href="./guide-fecmall-apphtml5-about.html">Fecmall html5 关于和介绍</a></div>
+<a class="list-group-item" href="#navigation-1979" data-toggle="collapse" data-parent="#navigation">Fecmall Appadmin 入口 <b class="caret"></b></a><div id="navigation-1979" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecmall-appadmin-about.html">Fecmall Admin 关于和介绍</a>
+<a class="list-group-item" href="./guide-fecmall-appadmin-file.html">Fecmall Admin 文件结构</a>
+<a class="list-group-item" href="./guide-fecmall-appadmin-menu-role.html">Fecmall Admin 菜单和权限</a>
+<a class="list-group-item" href="./guide-fecmall-appadmin-func.html">Fecmall Admin 功能介绍</a>
+<a class="list-group-item" href="./guide-fecmall-appadmin-developer.html">Fecmall Admin 二次开发</a>
+<a class="list-group-item" href="./guide-fecmall-appadmin-block-index.html">Fecmall Admin Block Index</a>
+<a class="list-group-item" href="./guide-fecmall-appadmin-block-edit.html">Fecmall Admin Block Edit</a>
+<a class="list-group-item" href="./guide-fecmall-appadmin-theme.html">Fecmall Admin 模板Theme</a></div>
+<a class="list-group-item" href="#navigation-1980" data-toggle="collapse" data-parent="#navigation">Fecshop console 入口 <b class="caret"></b></a><div id="navigation-1980" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecmall-console-about.html">Fecmall console 介绍和配置</a>
+<a class="list-group-item" href="./guide-fecmall-console-product-final-price.html">product: 计算最终价格的脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-product-qty-sync.html">product: 产品库存表库存数据同步到产品flat表的脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-product-category-sync-mysql-to-mongodb.html">product: Mysql产品分类数据同步到Mongodb的脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-product-category-sync-mongodb-to-mysql.html">product: Mongodb产品分类数据同步到Mysql的脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-sitemap.html">sitemap: 生成的脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-url-rewrite.html">url rewrite: 生成脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-pending-cancel.html">order: pending订单取消脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-order-product-count.html">order: 计算产品销量的脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-search-delete.html">search: 删除xunsearch所有数据的脚本</a>
+<a class="list-group-item" href="./guide-fecmall-console-search-sync.html">search: 产品同步到搜索的脚本</a></div>
+<a class="list-group-item" href="#navigation-1981" data-toggle="collapse" data-parent="#navigation">Fecmall Appapi 入口 <b class="caret"></b></a><div id="navigation-1981" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecmall-api.html">Fecmall Api 介绍和配置</a>
+<a class="list-group-item" href="./guide-fecmall-api-login-and-verification.html">Fecmall Api 登录和验证</a>
+<a class="list-group-item" href="./guide-fecmall-api-mutil-lang.html">Fecmall Api 多语言属性</a>
+<a class="list-group-item" href="./guide-fecmall-api-mutil-lang-list.html">Fecmall Api 获取多语言 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-mutil-lang-set.html">Fecmall Api 设置多语言</a>
+<a class="list-group-item" href="./guide-fecmall-api-currency-list.html">Fecmall Api 获取货币 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-currency-set.html">Fecmall Api 设置货币</a>
+<a class="list-group-item" href="./guide-fecmall-api-article.html">Fecmall Api Page List</a>
+<a class="list-group-item" href="./guide-fecmall-api-article-fetchone.html">Fecmall Api Page FetchOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-article-addone.html">Fecmall Api Page AddOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-article-updatene.html">Fecmall Api Page UpdateOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-article-deleteone.html">Fecmall Api Page DeleteOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-list.html">Fecmall Api 产品属性 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-attr-fetchone.html">Fecmall Api 产品属性 FetchOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-add.html">Fecmall Api 产品属性 AddOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-update.html">Fecmall Api 产品属性 UpdateOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-upsert.html">Fecmall Api 产品属性 UpsertOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-delete.html">Fecmall Api 产品属性 DeleteOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-group-list.html">Fecmall Api 产品属性组 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-attr-group-fetchone.html">Fecmall Api 产品属性组 FetchOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-group-add.html">Fecmall Api 产品属性组 AddOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-group-update.html">Fecmall Api 产品属性组 UpdateOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-group-upsert.html">Fecmall Api 产品属性组 UpsertOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-attr-group-delete.html">Fecmall Api 产品属性组 DeleteOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-brand-list.html">Fecmall Api 产品品牌 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-brand-upsert.html">Fecmall Api 产品品牌 UpsertOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-brand-upsert-2.html">Fecmall Api 产品品牌 UpsertOne-2</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-brand-category-list.html">Fecmall Api 产品品牌分类 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-brand-category-upsert.html">Fecmall Api 产品品牌分类 UpsertOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-brand-category-upsert-2.html">Fecmall Api 产品品牌分类 UpsertOne-2</a>
+<a class="list-group-item" href="./guide-fecmall-api-product.html">Fecmall Api 产品 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-fetchone.html">Fecmall Api 产品 FetchOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-addone.html">Fecmall Api 产品 AddOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-updatene.html">Fecmall Api 产品 UpdateOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-upsertone.html">Fecmall Api 产品 UpsertOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-upsertone-2.html">Fecmall Api 产品 UpsertOne-2</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-deleteone.html">Fecmall Api 产品 DeleteOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-image-sync.html">Fecmall Api 产品图片同步</a>
+<a class="list-group-item" href="./guide-fecmall-api-product-update-qty.html">Fecmall Api 产品 更新库存</a>
+<a class="list-group-item" href="./guide-fecmall-api-category.html">Fecmall Api 分类 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-category-fetchone.html">Fecmall Api 分类 FetchOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-category-addone.html">Fecmall Api 分类 AddOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-category-updatene.html">Fecmall Api 分类 UpdateOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-category-upsertone.html">Fecmall Api 分类 UpsertOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-category-upsertone-2.html">Fecmall Api 分类 UpsertOne-2</a>
+<a class="list-group-item" href="./guide-fecmall-api-category-deleteone.html">Fecmall Api 分类 DeleteOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-category-image-sync.html">Fecmall Api 分类图片同步</a>
+<a class="list-group-item" href="./guide-fecmall-api-order.html">Fecmall Api 订单 List</a>
+<a class="list-group-item" href="./guide-fecmall-api-order-fetchone.html">Fecmall Api 订单 FetchOne</a>
+<a class="list-group-item" href="./guide-fecmall-api-order-update-payment-status.html">Fecmall Api 订单 UpdateOrderStatus</a>
+<a class="list-group-item" href="./guide-fecmall-api-shopfw.html">Fecmall ShopFw采集工具api说明</a>
+<a class="list-group-item" href="./guide-fecmall-api-shopfw-product-add.html">Fecmall Api ShopFw-产品新增</a>
+<a class="list-group-item" href="./guide-fecmall-api-shopfw-product-update-stock-and-price.html">Fecmall Api ShopFw-产品更新库存和价格</a></div>
+<a class="list-group-item active" href="#navigation-1982" data-toggle="collapse" data-parent="#navigation">Fecmall Appserver 入口 <b class="caret"></b></a><div id="navigation-1982" class="submenu panel-collapse collapse in"><a class="list-group-item" href="./guide-fecmall-server.html">AppServer 服务端说明</a>
+<a class="list-group-item" href="./guide-fecmall-vue-config.html">Vue 客户端说明</a>
+<a class="list-group-item" href="./guide-fecmall-server-return-code.html">Api- 状态码</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-captcha.html">Api- Captcha验证码</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-home.html">Api- Home 得到首页信息</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-page.html">Api- Page 得到Page信息</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-category.html">Api- Category 得到分类信息</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-category-product.html">Api- Category 得到分类产品</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-cart.html">Api- Cart 得到Cart信息</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-paypal-express-start.html">Api- Cart Paypal Express Start</a>
+<a class="list-group-item active" href="./guide-fecmall-server-api-paypal-express-review.html">Api- Cart Paypal Express Review</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-paypal-express-review-submit-order.html">Api- Cart Paypal Express Review SubmitOrder</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-cart-update-info.html">Api- Cart 更新购物车信息</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-coupon-add.html">Api- Coupon 添加优惠券</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-coupon-cancel.html">Api- Coupon 取消优惠券</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-onepage.html">Api- Onepage 初始化信息</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-onepage-change-country.html">Api- Onepage change country</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-onepage-submit-order.html">Api- Onepage 提交订单</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-onepage-update-info.html">Api- Onepage 得到更新信息</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-paypal-standard-start.html">Api- Onepage Paypal Standard Start</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-paypal-standard-review.html">Api- Onepage Paypal Standard Review</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-alipay-standard-start.html">Api- Onepage Alipay Standard Start</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-alipay-standard-review.html">Api- Onepage Alipay Standard Review</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-alipay-standard-Ipn.html">Api- Onepage Alipay Standard Ipn</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-checkmoney-standard-start.html">Api- Onepage checkMoney Standard Start</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-payment-success.html">Api- Payment Success</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer.html">Api- Customer 账户中心</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-login.html">Api- Customer 登录初始化</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-login-submit.html">Api- Customer 登录提交</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-register.html">Api- Customer 注册初始化</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-register-submit.html">Api- Customer 注册提交</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-forgot-password-init.html">Api- Customer 忘记密码初始化</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-forgot-password-send-code.html">Api- Customer 忘记密码发送验证码</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-reset-password-init.html">Api- Customer 忘记密码重置初始化</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-reset-password-submit.html">Api- Customer 忘记密码重置提交</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-address.html">Api- Customer address 列表</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-address-remove.html">Api- Customer address 删除</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-address-edit-init.html">Api- Customer address 编辑初始化</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-address-edit-change-country.html">Api- Customer address 编辑切换国家</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-address-edit-submit.html">Api- Customer address 编辑提交</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-order-init.html">Api- Customer Order 列表</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-order-reorder.html">Api- Customer Order 重新下单 </a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-order-view.html">Api- Customer Order 查新订单详细 </a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-contacts.html">Api- Customer Contacts初始化</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-contacts-submit.html">Api- Customer Contacts提交</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-account-edit.html">Api- Customer account编辑</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-account-edit-submit.html">Api- Customer account编辑提交</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-product-favorite-list.html">Api- Customer 产品收藏列表</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-product-favorite-remove.html">Api- Customer 产品收藏删除</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-customer-product-review.html">Api- Customer 产品评论</a>
+<a class="list-group-item" href="./guide-fecmall-server-api-product-info.html">Api- Product 详细信息 </a>
+<a class="list-group-item" href="./guide-fecmall-server-api-product-add-to-cart.html">Api- Product 加入购物车 </a>
+<a class="list-group-item" href="./guide-fecmall-server-api-product-add-to-favorite.html">Api- Product 加入收藏 </a>
+<a class="list-group-item" href="./guide-fecmall-server-api-product-review-list.html">Api- Product Review List </a>
+<a class="list-group-item" href="./guide-fecmall-server-api-product-add-review.html">Api- Product Add Review Init </a>
+<a class="list-group-item" href="./guide-fecmall-server-api-product-search.html">Api- Product Search </a>
+<a class="list-group-item" href="./guide-fecmall-server-api-product-search-list.html">Api- Product Search 无限加载</a></div>
+<a class="list-group-item" href="#navigation-1983" data-toggle="collapse" data-parent="#navigation">Fecmall 服务（Service） <b class="caret"></b></a><div id="navigation-1983" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecmall-service-abc.html">Fecmall关于服务</a>
+<a class="list-group-item" href="./guide-fecmall-service-use.html">Fecmall 使用服务</a>
+<a class="list-group-item" href="./guide-fecmall-service-log.html">Fecmall Service Log</a></div>
+<a class="list-group-item" href="#navigation-1984" data-toggle="collapse" data-parent="#navigation">Fecmall 数据库 <b class="caret"></b></a><div id="navigation-1984" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecmall-database.html">Fecmall 数据库介绍</a>
+<a class="list-group-item" href="./guide-fecmall-database-mongodb.html">Fecmall Mongodb数据库</a>
+<a class="list-group-item" href="./guide-fecmall-database-mysqldb.html">Fecmall Mysqldb数据库</a></div>
+<a class="list-group-item" href="#navigation-1985" data-toggle="collapse" data-parent="#navigation">Fecmall 本地二开扩展 <b class="caret"></b></a><div id="navigation-1985" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecmall-admin-config.html">Fecmall 后台配置</a>
+<a class="list-group-item" href="./guide-fecmall-rewrite-func.html">Fecmall 重写功能</a>
+<a class="list-group-item" href="./guide-fecmall-js-css.html">Fecmall js css img</a>
+<a class="list-group-item" href="./guide-fecmall-theme.html">Fecmall 模板开发</a>
+<a class="list-group-item" href="./guide-fecmall-develop-services.html">Fecmall 服务开发</a>
+<a class="list-group-item" href="./guide-fecmall-develop-component.html">Fecmall 组件开发</a>
+<a class="list-group-item" href="./guide-fecmall-develop-modules.html">Fecmall 模块开发</a>
+<a class="list-group-item" href="./guide-fecmall-develop-plugin.html">Fecmall 插件开发</a></div>
+<a class="list-group-item" href="#navigation-1986" data-toggle="collapse" data-parent="#navigation">Fecmall 帮助 <b class="caret"></b></a><div id="navigation-1986" class="submenu panel-collapse collapse"><a class="list-group-item" href="./guide-fecshop-2-base-config.html">Fecmall-基础配置</a>
+<a class="list-group-item" href="./guide-fecshop-2-service-database.html">Fecmall-Service数据库配置</a>
+<a class="list-group-item" href="./guide-fecshop-2-search-engine.html">Fecmall-搜索引擎配置</a>
+<a class="list-group-item" href="./guide-fecshop-2-add-store.html">Fecmall-添加多语言Store</a>
+<a class="list-group-item" href="./guide-fecshop-2-use-redis.html">Fecmall-使用redis</a>
+<a class="list-group-item" href="./guide-fecshop-2-use-mongo.html">Fecmall-使用Mongodb</a>
+<a class="list-group-item" href="./guide-fecshop-2-use-xunsearch.html">Fecmall-使用Xunsearch</a>
+<a class="list-group-item" href="./guide-fecshop-shopfw-cj-product-data.html">Fecmall-Shopfw数据采集助理</a></div></div>    </div>
+    <div class="col-md-9 guide-content" role="main">
+        <h1>Api- Cart Paypal Express Review <span id="api-cart-paypal-express-review"></span><a href="#api-cart-paypal-express-review" class="hashlink">&para;</a></h1>
+<div class="toc"><ol><li><a href="#">一：请求部分</a></li>
+<li><a href="#">二：返回部分</a></li></ol></div>
+<blockquote><p>购物车页面点击paypal按钮，跳转到paypal登录，然后点击continue跳转回fecshop页面，
+页面初始化访问的api</p>
+</blockquote>
+<p>URL: <code>/payment/paypal/express/review</code></p>
+<p>格式：<code>json</code></p>
+<p>方式：<code>get</code></p>
+<h2>一：请求部分 <span id=""></span><a href="#" class="hashlink">&para;</a></h2><h4>1.Request Header <span id="1request-header"></span><a href="#1request-header" class="hashlink">&para;</a></h4><table>
+<thead>
+<tr><th>参数名称          </th><th>是否必须    </th><th> 类型        </th><th> 描述</th></tr>
+</thead>
+<tbody>
+<tr><td>access-token      </td><td>必须        </td><td>  String     </td><td>从localStorage取出来的值，识别用户登录状态的标示，用户登录成功，服务端返回access-token，VUE保存到localStorage中，在下一次请求从localStorage取出来放到request header中</td></tr>
+<tr><td>fecshop-currency  </td><td>必须        </td><td>  String     </td><td>从localStorage取出来的值，当前的货币值</td></tr>
+<tr><td>fecshop-lang      </td><td>必须        </td><td>  String     </td><td>从localStorage取出来的值，当前的语言code</td></tr>
+</tbody>
+</table>
+<h4>2.Request Body Form-Data： <span id="2request-body-form-data"></span><a href="#2request-body-form-data" class="hashlink">&para;</a></h4><table>
+<thead>
+<tr><th>参数名称        </th><th>是否必须    </th><th> 类型       </th><th> 描述</th></tr>
+</thead>
+<tbody>
+<tr><td>token           </td><td>必须        </td><td>  String     </td><td>paypal token</td></tr>
+<tr><td>PayerID         </td><td>必须        </td><td>  String     </td><td>paypal PayerID</td></tr>
+</tbody>
+</table>
+<p><strong>请求参数示例如下：</strong></p>
+<pre><code class="hljs css"><span class="hljs-rules">{
+    <span class="hljs-rule"><span class="hljs-attribute">token</span>:<span class="hljs-value"> <span class="hljs-string">"EC-1TN688728J034651L"</span>,
+    PayerID: <span class="hljs-string">"FKL4V7D5GCACY"</span>
+</span></span></span>}
+</code></pre>
+<h2>二：返回部分 <span id=""></span><a href="#" class="hashlink">&para;</a></h2><h4>1.Reponse Header <span id="1reponse-header"></span><a href="#1reponse-header" class="hashlink">&para;</a></h4><table>
+<thead>
+<tr><th>参数名称          </th><th>是否必须    </th><th> 类型        </th><th> 描述</th></tr>
+</thead>
+<tbody>
+<tr><td>access-token      </td><td>选填        </td><td>  String     </td><td>用户登录成功，服务端返回access-token，VUE保存到localStorage中，在下一次请求从localStorage取出来放到request header中</td></tr>
+</tbody>
+</table>
+<h4>2.Reponse Body Form-Data： <span id="2reponse-body-form-data"></span><a href="#2reponse-body-form-data" class="hashlink">&para;</a></h4><p>格式：<code>json</code></p>
+<table>
+<thead>
+<tr><th>参数名称        </th><th>是否必须    </th><th> 类型       </th><th> 描述</th></tr>
+</thead>
+<tbody>
+<tr><td>code            </td><td>必须        </td><td>  Number    </td><td>返回状态码，200 代表完成，完整的返回状态码详细参看:<a href="guide-fecshop-server-return-code.html">Api- 状态码</a></td></tr>
+<tr><td>message         </td><td>必须        </td><td>  String    </td><td>返回状态字符串描述</td></tr>
+<tr><td>data            </td><td>必须        </td><td>  Array     </td><td>返回详细数据</td></tr>
+</tbody>
+</table>
+<h4>3.参数code所有返回状态码：（完整的返回状态码详细参看:<a href="guide-fecshop-server-return-code.html">Api- 状态码</a> ） <span id="3codeapi"></span><a href="#3codeapi" class="hashlink">&para;</a></h4><table>
+<thead>
+<tr><th>code Value      </th><th>       描述</th></tr>
+</thead>
+<tbody>
+<tr><td>200             </td><td>成功状态码</td></tr>
+<tr><td>1500007         </td><td>Order: 下订单，购物车数据为空</td></tr>
+<tr><td>1500003         </td><td>Order: 通过paypal express方式支付，获取token失败</td></tr>
+<tr><td>1500015         </td><td>Order: 通过paypal express方式支付，获取PayerID失败</td></tr>
+<tr><td>1500016         </td><td>Order: 通过paypal express方式支付，获取address失败</td></tr>
+</tbody>
+</table>
+<h4>4.返回数据举例： <span id="4"></span><a href="#4" class="hashlink">&para;</a></h4><p>各个字段的具体函数参看<a href="guide-fecshop-server-api-onepage.html">fecshop-server-api-onepage.md</a></p>
+<pre><code class="hljs json">{
+    "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-number">200</span></span>,
+    "<span class="hljs-attribute">message</span>": <span class="hljs-value"><span class="hljs-string">"process success"</span></span>,
+    "<span class="hljs-attribute">data</span>": <span class="hljs-value">{
+        "<span class="hljs-attribute">payments</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">check_money</span>": <span class="hljs-value">{
+                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Check / Money Order"</span></span>,
+                "<span class="hljs-attribute">imageUrl</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                "<span class="hljs-attribute">supplement</span>": <span class="hljs-value"><span class="hljs-string">"Off-line Money Payments"</span>
+            </span>}</span>,
+            "<span class="hljs-attribute">paypal_standard</span>": <span class="hljs-value">{
+                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"PayPal Express Payments"</span></span>,
+                "<span class="hljs-attribute">imageUrl</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                "<span class="hljs-attribute">supplement</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+                "<span class="hljs-attribute">checked</span>": <span class="hljs-value"><span class="hljs-literal">true</span>
+            </span>}</span>,
+            "<span class="hljs-attribute">alipay_standard</span>": <span class="hljs-value">{
+                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"支付宝支付"</span></span>,
+                "<span class="hljs-attribute">imageUrl</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                "<span class="hljs-attribute">supplement</span>": <span class="hljs-value"><span class="hljs-literal">null</span>
+            </span>}
+        </span>}</span>,
+        "<span class="hljs-attribute">shippings</span>": <span class="hljs-value">[
+            {
+                "<span class="hljs-attribute">method</span>": <span class="hljs-value"><span class="hljs-string">"free_shipping"</span></span>,
+                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Free shipping( 7-20 work days)"</span></span>,
+                "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"HKBRAM"</span></span>,
+                "<span class="hljs-attribute">cost</span>": <span class="hljs-value"><span class="hljs-string">"0.00"</span></span>,
+                "<span class="hljs-attribute">symbol</span>": <span class="hljs-value"><span class="hljs-string">"€"</span></span>,
+                "<span class="hljs-attribute">checked</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                "<span class="hljs-attribute">shipping_i</span>": <span class="hljs-value"><span class="hljs-number">1</span>
+            </span>},
+            {
+                "<span class="hljs-attribute">method</span>": <span class="hljs-value"><span class="hljs-string">"fast_shipping"</span></span>,
+                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">"Fast Shipping( 5-10 work days)"</span></span>,
+                "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"HKDHL"</span></span>,
+                "<span class="hljs-attribute">cost</span>": <span class="hljs-value"><span class="hljs-number">120.9</span></span>,
+                "<span class="hljs-attribute">symbol</span>": <span class="hljs-value"><span class="hljs-string">"€"</span></span>,
+                "<span class="hljs-attribute">checked</span>": <span class="hljs-value"><span class="hljs-literal">true</span></span>,
+                "<span class="hljs-attribute">shipping_i</span>": <span class="hljs-value"><span class="hljs-number">2</span>
+            </span>}
+        ]</span>,
+        "<span class="hljs-attribute">current_payment_method</span>": <span class="hljs-value"><span class="hljs-string">"paypal_standard"</span></span>,
+        "<span class="hljs-attribute">current_shipping_method</span>": <span class="hljs-value"><span class="hljs-string">"fast_shipping"</span></span>,
+        "<span class="hljs-attribute">cart_info</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">store</span>": <span class="hljs-value"><span class="hljs-string">"fecshop.appserver.fancyecommerce.com"</span></span>,
+            "<span class="hljs-attribute">items_count</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+            "<span class="hljs-attribute">coupon_code</span>": <span class="hljs-value"><span class="hljs-literal">null</span></span>,
+            "<span class="hljs-attribute">shipping_method</span>": <span class="hljs-value"><span class="hljs-string">"fast_shipping"</span></span>,
+            "<span class="hljs-attribute">payment_method</span>": <span class="hljs-value"><span class="hljs-string">"paypal_standard"</span></span>,
+            "<span class="hljs-attribute">grand_total</span>": <span class="hljs-value"><span class="hljs-string">"125.60"</span></span>,
+            "<span class="hljs-attribute">shipping_cost</span>": <span class="hljs-value"><span class="hljs-string">"120.90"</span></span>,
+            "<span class="hljs-attribute">coupon_cost</span>": <span class="hljs-value"><span class="hljs-string">"0.00"</span></span>,
+            "<span class="hljs-attribute">product_total</span>": <span class="hljs-value"><span class="hljs-string">"4.70"</span></span>,
+            "<span class="hljs-attribute">base_grand_total</span>": <span class="hljs-value"><span class="hljs-string">"135.05"</span></span>,
+            "<span class="hljs-attribute">base_shipping_cost</span>": <span class="hljs-value"><span class="hljs-string">"130.00"</span></span>,
+            "<span class="hljs-attribute">base_coupon_cost</span>": <span class="hljs-value"><span class="hljs-string">"0.00"</span></span>,
+            "<span class="hljs-attribute">base_product_total</span>": <span class="hljs-value"><span class="hljs-string">"5.05"</span></span>,
+            "<span class="hljs-attribute">products</span>": <span class="hljs-value">[
+                {
+                    "<span class="hljs-attribute">item_id</span>": <span class="hljs-value"><span class="hljs-number">447</span></span>,
+                    "<span class="hljs-attribute">product_id</span>": <span class="hljs-value"><span class="hljs-string">"580835d0f656f240742f0b7c"</span></span>,
+                    "<span class="hljs-attribute">sku</span>": <span class="hljs-value"><span class="hljs-string">"p10001-kahaki-xl"</span></span>,
+                    "<span class="hljs-attribute">name</span>": <span class="hljs-value"><span class="hljs-string">"Raglan Sleeves Letter Printed Crew Neck Sweatshirt kahaki-xl"</span></span>,
+                    "<span class="hljs-attribute">qty</span>": <span class="hljs-value"><span class="hljs-number">1</span></span>,
+                    "<span class="hljs-attribute">custom_option_sku</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                    "<span class="hljs-attribute">product_price</span>": <span class="hljs-value"><span class="hljs-number">4.7</span></span>,
+                    "<span class="hljs-attribute">product_row_price</span>": <span class="hljs-value"><span class="hljs-number">4.7</span></span>,
+                    "<span class="hljs-attribute">base_product_price</span>": <span class="hljs-value"><span class="hljs-number">5.05</span></span>,
+                    "<span class="hljs-attribute">base_product_row_price</span>": <span class="hljs-value"><span class="hljs-number">5.05</span></span>,
+                    "<span class="hljs-attribute">product_name</span>": <span class="hljs-value">{
+                        "<span class="hljs-attribute">name_en</span>": <span class="hljs-value"><span class="hljs-string">"Raglan Sleeves Letter Printed Crew Neck Sweatshirt kahaki-xl"</span></span>,
+                        "<span class="hljs-attribute">name_fr</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                        "<span class="hljs-attribute">name_de</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                        "<span class="hljs-attribute">name_es</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                        "<span class="hljs-attribute">name_ru</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                        "<span class="hljs-attribute">name_pt</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                        "<span class="hljs-attribute">name_zh</span>": <span class="hljs-value"><span class="hljs-string">"袖子信件印刷船员颈部运动衫kahaki xl"</span>
+                    </span>}</span>,
+                    "<span class="hljs-attribute">product_weight</span>": <span class="hljs-value"><span class="hljs-number">55</span></span>,
+                    "<span class="hljs-attribute">product_row_weight</span>": <span class="hljs-value"><span class="hljs-number">55</span></span>,
+                    "<span class="hljs-attribute">product_url</span>": <span class="hljs-value"><span class="hljs-string">"/raglan-sleeves-letter-printed-crew-neck-sweatshirt-53386451-77774122"</span></span>,
+                    "<span class="hljs-attribute">product_image</span>": <span class="hljs-value">{
+                        "<span class="hljs-attribute">gallery</span>": <span class="hljs-value">[
+                            {
+                                "<span class="hljs-attribute">image</span>": <span class="hljs-value"><span class="hljs-string">"/2/01/20160905101021_56532.jpg"</span></span>,
+                                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">sort_order</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">is_thumbnails</span>": <span class="hljs-value"><span class="hljs-string">"1"</span></span>,
+                                "<span class="hljs-attribute">is_detail</span>": <span class="hljs-value"><span class="hljs-string">"1"</span>
+                            </span>},
+                            {
+                                "<span class="hljs-attribute">image</span>": <span class="hljs-value"><span class="hljs-string">"/2/01/20160905101022_25969.jpg"</span></span>,
+                                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">sort_order</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">is_thumbnails</span>": <span class="hljs-value"><span class="hljs-string">"1"</span></span>,
+                                "<span class="hljs-attribute">is_detail</span>": <span class="hljs-value"><span class="hljs-string">"1"</span>
+                            </span>},
+                            {
+                                "<span class="hljs-attribute">image</span>": <span class="hljs-value"><span class="hljs-string">"/2/01/20160905101022_79159.jpg"</span></span>,
+                                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">sort_order</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">is_thumbnails</span>": <span class="hljs-value"><span class="hljs-string">"1"</span></span>,
+                                "<span class="hljs-attribute">is_detail</span>": <span class="hljs-value"><span class="hljs-string">"1"</span>
+                            </span>},
+                            {
+                                "<span class="hljs-attribute">image</span>": <span class="hljs-value"><span class="hljs-string">"/2/01/20160905101021_28071147710702992998.jpg"</span></span>,
+                                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">sort_order</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">is_thumbnails</span>": <span class="hljs-value"><span class="hljs-string">"1"</span></span>,
+                                "<span class="hljs-attribute">is_detail</span>": <span class="hljs-value"><span class="hljs-string">"1"</span>
+                            </span>},
+                            {
+                                "<span class="hljs-attribute">image</span>": <span class="hljs-value"><span class="hljs-string">"/2/01/20160905101021_28071147710703579813.jpg"</span></span>,
+                                "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">sort_order</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                                "<span class="hljs-attribute">is_thumbnails</span>": <span class="hljs-value"><span class="hljs-string">"1"</span></span>,
+                                "<span class="hljs-attribute">is_detail</span>": <span class="hljs-value"><span class="hljs-string">"1"</span>
+                            </span>}
+                        ]</span>,
+                        "<span class="hljs-attribute">main</span>": <span class="hljs-value">{
+                            "<span class="hljs-attribute">image</span>": <span class="hljs-value"><span class="hljs-string">"/2/01/20160905101021_28071.jpg"</span></span>,
+                            "<span class="hljs-attribute">label</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                            "<span class="hljs-attribute">sort_order</span>": <span class="hljs-value"><span class="hljs-string">""</span></span>,
+                            "<span class="hljs-attribute">is_thumbnails</span>": <span class="hljs-value"><span class="hljs-string">"1"</span></span>,
+                            "<span class="hljs-attribute">is_detail</span>": <span class="hljs-value"><span class="hljs-string">"1"</span>
+                        </span>}
+                    </span>}</span>,
+                    "<span class="hljs-attribute">custom_option</span>": <span class="hljs-value">[]</span>,
+                    "<span class="hljs-attribute">spu_options</span>": <span class="hljs-value">{
+                        "<span class="hljs-attribute">color</span>": <span class="hljs-value"><span class="hljs-string">"khaki"</span></span>,
+                        "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-string">"XL"</span></span>,
+                        "<span class="hljs-attribute">test3</span>": <span class="hljs-value"><span class="hljs-string">"t_1"</span>
+                    </span>}</span>,
+                    "<span class="hljs-attribute">imgUrl</span>": <span class="hljs-value"><span class="hljs-string">"//img.fancyecommerce.com/media/catalog/product/cache/bd935443df1c50537d4edaab4af5d446/100/100/2/01/20160905101021_28071.jpg"</span></span>,
+                    "<span class="hljs-attribute">custom_option_info</span>": <span class="hljs-value">{
+                        "<span class="hljs-attribute">color</span>": <span class="hljs-value"><span class="hljs-string">"khaki"</span></span>,
+                        "<span class="hljs-attribute">size</span>": <span class="hljs-value"><span class="hljs-string">"XL"</span></span>,
+                        "<span class="hljs-attribute">test3</span>": <span class="hljs-value"><span class="hljs-string">"t_1"</span>
+                    </span>}
+                </span>}
+            ]</span>,
+            "<span class="hljs-attribute">product_weight</span>": <span class="hljs-value"><span class="hljs-number">55</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">currency_info</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">code</span>": <span class="hljs-value"><span class="hljs-string">"EUR"</span></span>,
+            "<span class="hljs-attribute">rate</span>": <span class="hljs-value"><span class="hljs-number">0.93</span></span>,
+            "<span class="hljs-attribute">symbol</span>": <span class="hljs-value"><span class="hljs-string">"€"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">isGuest</span>": <span class="hljs-value"><span class="hljs-number">0</span></span>,
+        "<span class="hljs-attribute">address_list</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">118</span>": <span class="hljs-value">{
+                "<span class="hljs-attribute">address</span>": <span class="hljs-value"><span class="hljs-string">"2121 2121 fdfd@3232.com 2121 2121 2121 NO Austria 2121 2121"</span></span>,
+                "<span class="hljs-attribute">is_default</span>": <span class="hljs-value"><span class="hljs-string">"1"</span>
+            </span>}
+        </span>}</span>,
+        "<span class="hljs-attribute">cart_address</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">country</span>": <span class="hljs-value"><span class="hljs-string">"US"</span></span>,
+            "<span class="hljs-attribute">state</span>": <span class="hljs-value"><span class="hljs-string">"NY"</span></span>,
+            "<span class="hljs-attribute">first_name</span>": <span class="hljs-value"><span class="hljs-string">"test"</span></span>,
+            "<span class="hljs-attribute">last_name</span>": <span class="hljs-value"><span class="hljs-string">"facilitator"</span></span>,
+            "<span class="hljs-attribute">email</span>": <span class="hljs-value"><span class="hljs-string">"zqy234api1-facilitator-1@126.com"</span></span>,
+            "<span class="hljs-attribute">telephone</span>": <span class="hljs-value"><span class="hljs-string">"2121"</span></span>,
+            "<span class="hljs-attribute">street1</span>": <span class="hljs-value"><span class="hljs-string">"4114 Sepulveda Blvd."</span></span>,
+            "<span class="hljs-attribute">street2</span>": <span class="hljs-value"><span class="hljs-string">"4114 Sepulveda Blvd."</span></span>,
+            "<span class="hljs-attribute">city</span>": <span class="hljs-value"><span class="hljs-string">"New York"</span></span>,
+            "<span class="hljs-attribute">zip</span>": <span class="hljs-value"><span class="hljs-string">"10021"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">cart_address_id</span>": <span class="hljs-value"><span class="hljs-number">118</span></span>,
+        "<span class="hljs-attribute">countryArr</span>": <span class="hljs-value">{
+            "<span class="hljs-attribute">AF</span>": <span class="hljs-value"><span class="hljs-string">"Afghanistan"</span></span>,
+            "<span class="hljs-attribute">AX</span>": <span class="hljs-value"><span class="hljs-string">"?land Islands"</span></span>,
+            "<span class="hljs-attribute">AL</span>": <span class="hljs-value"><span class="hljs-string">"Albania"</span></span>,
+            "<span class="hljs-attribute">DZ</span>": <span class="hljs-value"><span class="hljs-string">"Algeria"</span></span>,
+            "<span class="hljs-attribute">AS</span>": <span class="hljs-value"><span class="hljs-string">"American Samoa"</span></span>,
+            "<span class="hljs-attribute">AD</span>": <span class="hljs-value"><span class="hljs-string">"Andorra"</span></span>,
+            "<span class="hljs-attribute">AO</span>": <span class="hljs-value"><span class="hljs-string">"Angola"</span></span>,
+            "<span class="hljs-attribute">AI</span>": <span class="hljs-value"><span class="hljs-string">"Anguilla"</span></span>,
+            "<span class="hljs-attribute">AQ</span>": <span class="hljs-value"><span class="hljs-string">"Antarctica"</span></span>,
+            "<span class="hljs-attribute">AG</span>": <span class="hljs-value"><span class="hljs-string">"Antigua and Barbuda"</span></span>,
+            "<span class="hljs-attribute">AR</span>": <span class="hljs-value"><span class="hljs-string">"Argentina"</span></span>,
+            "<span class="hljs-attribute">AM</span>": <span class="hljs-value"><span class="hljs-string">"Armenia"</span></span>,
+            "<span class="hljs-attribute">AW</span>": <span class="hljs-value"><span class="hljs-string">"Aruba"</span></span>,
+            "<span class="hljs-attribute">AU</span>": <span class="hljs-value"><span class="hljs-string">"Australia"</span></span>,
+            "<span class="hljs-attribute">AT</span>": <span class="hljs-value"><span class="hljs-string">"Austria"</span></span>,
+            "<span class="hljs-attribute">AZ</span>": <span class="hljs-value"><span class="hljs-string">"Azerbaijan"</span></span>,
+            "<span class="hljs-attribute">BS</span>": <span class="hljs-value"><span class="hljs-string">"Bahamas"</span></span>,
+            "<span class="hljs-attribute">BH</span>": <span class="hljs-value"><span class="hljs-string">"Bahrain"</span></span>,
+            "<span class="hljs-attribute">BD</span>": <span class="hljs-value"><span class="hljs-string">"Bangladesh"</span></span>,
+            "<span class="hljs-attribute">BB</span>": <span class="hljs-value"><span class="hljs-string">"Barbados"</span></span>,
+            "<span class="hljs-attribute">BY</span>": <span class="hljs-value"><span class="hljs-string">"Belarus"</span></span>,
+            "<span class="hljs-attribute">BE</span>": <span class="hljs-value"><span class="hljs-string">"Belgium"</span></span>,
+            "<span class="hljs-attribute">BZ</span>": <span class="hljs-value"><span class="hljs-string">"Belize"</span></span>,
+            "<span class="hljs-attribute">BJ</span>": <span class="hljs-value"><span class="hljs-string">"Benin"</span></span>,
+            "<span class="hljs-attribute">BM</span>": <span class="hljs-value"><span class="hljs-string">"Bermuda"</span></span>,
+            "<span class="hljs-attribute">BT</span>": <span class="hljs-value"><span class="hljs-string">"Bhutan"</span></span>,
+            "<span class="hljs-attribute">BO</span>": <span class="hljs-value"><span class="hljs-string">"Bolivia"</span></span>,
+            "<span class="hljs-attribute">BA</span>": <span class="hljs-value"><span class="hljs-string">"Bosnia and Herzegovina"</span></span>,
+            "<span class="hljs-attribute">BW</span>": <span class="hljs-value"><span class="hljs-string">"Botswana"</span></span>,
+            "<span class="hljs-attribute">BV</span>": <span class="hljs-value"><span class="hljs-string">"Bouvet Island"</span></span>,
+            "<span class="hljs-attribute">BR</span>": <span class="hljs-value"><span class="hljs-string">"Brazil"</span></span>,
+            "<span class="hljs-attribute">IO</span>": <span class="hljs-value"><span class="hljs-string">"British Indian Ocean Territory"</span></span>,
+            "<span class="hljs-attribute">VG</span>": <span class="hljs-value"><span class="hljs-string">"British Virgin Islands"</span></span>,
+            "<span class="hljs-attribute">BN</span>": <span class="hljs-value"><span class="hljs-string">"Brunei"</span></span>,
+            "<span class="hljs-attribute">BG</span>": <span class="hljs-value"><span class="hljs-string">"Bulgaria"</span></span>,
+            "<span class="hljs-attribute">BF</span>": <span class="hljs-value"><span class="hljs-string">"Burkina Faso"</span></span>,
+            "<span class="hljs-attribute">BI</span>": <span class="hljs-value"><span class="hljs-string">"Burundi"</span></span>,
+            "<span class="hljs-attribute">KH</span>": <span class="hljs-value"><span class="hljs-string">"Cambodia"</span></span>,
+            "<span class="hljs-attribute">CM</span>": <span class="hljs-value"><span class="hljs-string">"Cameroon"</span></span>,
+            "<span class="hljs-attribute">CA</span>": <span class="hljs-value"><span class="hljs-string">"Canada"</span></span>,
+            "<span class="hljs-attribute">CV</span>": <span class="hljs-value"><span class="hljs-string">"Cape Verde"</span></span>,
+            "<span class="hljs-attribute">KY</span>": <span class="hljs-value"><span class="hljs-string">"Cayman Islands"</span></span>,
+            "<span class="hljs-attribute">CF</span>": <span class="hljs-value"><span class="hljs-string">"Central African Republic"</span></span>,
+            "<span class="hljs-attribute">TD</span>": <span class="hljs-value"><span class="hljs-string">"Chad"</span></span>,
+            "<span class="hljs-attribute">CL</span>": <span class="hljs-value"><span class="hljs-string">"Chile"</span></span>,
+            "<span class="hljs-attribute">CN</span>": <span class="hljs-value"><span class="hljs-string">"China"</span></span>,
+            "<span class="hljs-attribute">CX</span>": <span class="hljs-value"><span class="hljs-string">"Christmas Island"</span></span>,
+            "<span class="hljs-attribute">CC</span>": <span class="hljs-value"><span class="hljs-string">"Cocos [Keeling] Islands"</span></span>,
+            "<span class="hljs-attribute">CO</span>": <span class="hljs-value"><span class="hljs-string">"Colombia"</span></span>,
+            "<span class="hljs-attribute">KM</span>": <span class="hljs-value"><span class="hljs-string">"Comoros"</span></span>,
+            "<span class="hljs-attribute">CG</span>": <span class="hljs-value"><span class="hljs-string">"Congo - Brazzaville"</span></span>,
+            "<span class="hljs-attribute">CD</span>": <span class="hljs-value"><span class="hljs-string">"Congo - Kinshasa"</span></span>,
+            "<span class="hljs-attribute">CK</span>": <span class="hljs-value"><span class="hljs-string">"Cook Islands"</span></span>,
+            "<span class="hljs-attribute">CR</span>": <span class="hljs-value"><span class="hljs-string">"Costa Rica"</span></span>,
+            "<span class="hljs-attribute">CI</span>": <span class="hljs-value"><span class="hljs-string">"C?te d’Ivoire"</span></span>,
+            "<span class="hljs-attribute">HR</span>": <span class="hljs-value"><span class="hljs-string">"Croatia"</span></span>,
+            "<span class="hljs-attribute">CU</span>": <span class="hljs-value"><span class="hljs-string">"Cuba"</span></span>,
+            "<span class="hljs-attribute">CY</span>": <span class="hljs-value"><span class="hljs-string">"Cyprus"</span></span>,
+            "<span class="hljs-attribute">CZ</span>": <span class="hljs-value"><span class="hljs-string">"Czech Republic"</span></span>,
+            "<span class="hljs-attribute">DK</span>": <span class="hljs-value"><span class="hljs-string">"Denmark"</span></span>,
+            "<span class="hljs-attribute">DJ</span>": <span class="hljs-value"><span class="hljs-string">"Djibouti"</span></span>,
+            "<span class="hljs-attribute">DM</span>": <span class="hljs-value"><span class="hljs-string">"Dominica"</span></span>,
+            "<span class="hljs-attribute">DO</span>": <span class="hljs-value"><span class="hljs-string">"Dominican Republic"</span></span>,
+            "<span class="hljs-attribute">EC</span>": <span class="hljs-value"><span class="hljs-string">"Ecuador"</span></span>,
+            "<span class="hljs-attribute">EG</span>": <span class="hljs-value"><span class="hljs-string">"Egypt"</span></span>,
+            "<span class="hljs-attribute">SV</span>": <span class="hljs-value"><span class="hljs-string">"El Salvador"</span></span>,
+            "<span class="hljs-attribute">GQ</span>": <span class="hljs-value"><span class="hljs-string">"Equatorial Guinea"</span></span>,
+            "<span class="hljs-attribute">ER</span>": <span class="hljs-value"><span class="hljs-string">"Eritrea"</span></span>,
+            "<span class="hljs-attribute">EE</span>": <span class="hljs-value"><span class="hljs-string">"Estonia"</span></span>,
+            "<span class="hljs-attribute">ET</span>": <span class="hljs-value"><span class="hljs-string">"Ethiopia"</span></span>,
+            "<span class="hljs-attribute">FK</span>": <span class="hljs-value"><span class="hljs-string">"Falkland Islands"</span></span>,
+            "<span class="hljs-attribute">FO</span>": <span class="hljs-value"><span class="hljs-string">"Faroe Islands"</span></span>,
+            "<span class="hljs-attribute">FJ</span>": <span class="hljs-value"><span class="hljs-string">"Fiji"</span></span>,
+            "<span class="hljs-attribute">FI</span>": <span class="hljs-value"><span class="hljs-string">"Finland"</span></span>,
+            "<span class="hljs-attribute">FR</span>": <span class="hljs-value"><span class="hljs-string">"France"</span></span>,
+            "<span class="hljs-attribute">GF</span>": <span class="hljs-value"><span class="hljs-string">"French Guiana"</span></span>,
+            "<span class="hljs-attribute">PF</span>": <span class="hljs-value"><span class="hljs-string">"French Polynesia"</span></span>,
+            "<span class="hljs-attribute">TF</span>": <span class="hljs-value"><span class="hljs-string">"French Southern Territories"</span></span>,
+            "<span class="hljs-attribute">GA</span>": <span class="hljs-value"><span class="hljs-string">"Gabon"</span></span>,
+            "<span class="hljs-attribute">GM</span>": <span class="hljs-value"><span class="hljs-string">"Gambia"</span></span>,
+            "<span class="hljs-attribute">GE</span>": <span class="hljs-value"><span class="hljs-string">"Georgia"</span></span>,
+            "<span class="hljs-attribute">DE</span>": <span class="hljs-value"><span class="hljs-string">"Germany"</span></span>,
+            "<span class="hljs-attribute">GH</span>": <span class="hljs-value"><span class="hljs-string">"Ghana"</span></span>,
+            "<span class="hljs-attribute">GI</span>": <span class="hljs-value"><span class="hljs-string">"Gibraltar"</span></span>,
+            "<span class="hljs-attribute">GR</span>": <span class="hljs-value"><span class="hljs-string">"Greece"</span></span>,
+            "<span class="hljs-attribute">GL</span>": <span class="hljs-value"><span class="hljs-string">"Greenland"</span></span>,
+            "<span class="hljs-attribute">GD</span>": <span class="hljs-value"><span class="hljs-string">"Grenada"</span></span>,
+            "<span class="hljs-attribute">GP</span>": <span class="hljs-value"><span class="hljs-string">"Guadeloupe"</span></span>,
+            "<span class="hljs-attribute">GU</span>": <span class="hljs-value"><span class="hljs-string">"Guam"</span></span>,
+            "<span class="hljs-attribute">GT</span>": <span class="hljs-value"><span class="hljs-string">"Guatemala"</span></span>,
+            "<span class="hljs-attribute">GG</span>": <span class="hljs-value"><span class="hljs-string">"Guernsey"</span></span>,
+            "<span class="hljs-attribute">GN</span>": <span class="hljs-value"><span class="hljs-string">"Guinea"</span></span>,
+            "<span class="hljs-attribute">GW</span>": <span class="hljs-value"><span class="hljs-string">"Guinea-Bissau"</span></span>,
+            "<span class="hljs-attribute">GY</span>": <span class="hljs-value"><span class="hljs-string">"Guyana"</span></span>,
+            "<span class="hljs-attribute">HT</span>": <span class="hljs-value"><span class="hljs-string">"Haiti"</span></span>,
+            "<span class="hljs-attribute">HM</span>": <span class="hljs-value"><span class="hljs-string">"Heard Island and McDonald Islands"</span></span>,
+            "<span class="hljs-attribute">HN</span>": <span class="hljs-value"><span class="hljs-string">"Honduras"</span></span>,
+            "<span class="hljs-attribute">HK</span>": <span class="hljs-value"><span class="hljs-string">"Hong Kong SAR China"</span></span>,
+            "<span class="hljs-attribute">HU</span>": <span class="hljs-value"><span class="hljs-string">"Hungary"</span></span>,
+            "<span class="hljs-attribute">IS</span>": <span class="hljs-value"><span class="hljs-string">"Iceland"</span></span>,
+            "<span class="hljs-attribute">IN</span>": <span class="hljs-value"><span class="hljs-string">"India"</span></span>,
+            "<span class="hljs-attribute">ID</span>": <span class="hljs-value"><span class="hljs-string">"Indonesia"</span></span>,
+            "<span class="hljs-attribute">IR</span>": <span class="hljs-value"><span class="hljs-string">"Iran"</span></span>,
+            "<span class="hljs-attribute">IQ</span>": <span class="hljs-value"><span class="hljs-string">"Iraq"</span></span>,
+            "<span class="hljs-attribute">IE</span>": <span class="hljs-value"><span class="hljs-string">"Ireland"</span></span>,
+            "<span class="hljs-attribute">IM</span>": <span class="hljs-value"><span class="hljs-string">"Isle of Man"</span></span>,
+            "<span class="hljs-attribute">IL</span>": <span class="hljs-value"><span class="hljs-string">"Israel"</span></span>,
+            "<span class="hljs-attribute">IT</span>": <span class="hljs-value"><span class="hljs-string">"Italy"</span></span>,
+            "<span class="hljs-attribute">JM</span>": <span class="hljs-value"><span class="hljs-string">"Jamaica"</span></span>,
+            "<span class="hljs-attribute">JP</span>": <span class="hljs-value"><span class="hljs-string">"Japan"</span></span>,
+            "<span class="hljs-attribute">JE</span>": <span class="hljs-value"><span class="hljs-string">"Jersey"</span></span>,
+            "<span class="hljs-attribute">JO</span>": <span class="hljs-value"><span class="hljs-string">"Jordan"</span></span>,
+            "<span class="hljs-attribute">KZ</span>": <span class="hljs-value"><span class="hljs-string">"Kazakhstan"</span></span>,
+            "<span class="hljs-attribute">KE</span>": <span class="hljs-value"><span class="hljs-string">"Kenya"</span></span>,
+            "<span class="hljs-attribute">KI</span>": <span class="hljs-value"><span class="hljs-string">"Kiribati"</span></span>,
+            "<span class="hljs-attribute">KW</span>": <span class="hljs-value"><span class="hljs-string">"Kuwait"</span></span>,
+            "<span class="hljs-attribute">KG</span>": <span class="hljs-value"><span class="hljs-string">"Kyrgyzstan"</span></span>,
+            "<span class="hljs-attribute">LA</span>": <span class="hljs-value"><span class="hljs-string">"Laos"</span></span>,
+            "<span class="hljs-attribute">LV</span>": <span class="hljs-value"><span class="hljs-string">"Latvia"</span></span>,
+            "<span class="hljs-attribute">LB</span>": <span class="hljs-value"><span class="hljs-string">"Lebanon"</span></span>,
+            "<span class="hljs-attribute">LS</span>": <span class="hljs-value"><span class="hljs-string">"Lesotho"</span></span>,
+            "<span class="hljs-attribute">LR</span>": <span class="hljs-value"><span class="hljs-string">"Liberia"</span></span>,
+            "<span class="hljs-attribute">LY</span>": <span class="hljs-value"><span class="hljs-string">"Libya"</span></span>,
+            "<span class="hljs-attribute">LI</span>": <span class="hljs-value"><span class="hljs-string">"Liechtenstein"</span></span>,
+            "<span class="hljs-attribute">LT</span>": <span class="hljs-value"><span class="hljs-string">"Lithuania"</span></span>,
+            "<span class="hljs-attribute">LU</span>": <span class="hljs-value"><span class="hljs-string">"Luxembourg"</span></span>,
+            "<span class="hljs-attribute">MO</span>": <span class="hljs-value"><span class="hljs-string">"Macau SAR China"</span></span>,
+            "<span class="hljs-attribute">MK</span>": <span class="hljs-value"><span class="hljs-string">"Macedonia"</span></span>,
+            "<span class="hljs-attribute">MG</span>": <span class="hljs-value"><span class="hljs-string">"Madagascar"</span></span>,
+            "<span class="hljs-attribute">MW</span>": <span class="hljs-value"><span class="hljs-string">"Malawi"</span></span>,
+            "<span class="hljs-attribute">MY</span>": <span class="hljs-value"><span class="hljs-string">"Malaysia"</span></span>,
+            "<span class="hljs-attribute">MV</span>": <span class="hljs-value"><span class="hljs-string">"Maldives"</span></span>,
+            "<span class="hljs-attribute">ML</span>": <span class="hljs-value"><span class="hljs-string">"Mali"</span></span>,
+            "<span class="hljs-attribute">MT</span>": <span class="hljs-value"><span class="hljs-string">"Malta"</span></span>,
+            "<span class="hljs-attribute">MH</span>": <span class="hljs-value"><span class="hljs-string">"Marshall Islands"</span></span>,
+            "<span class="hljs-attribute">MQ</span>": <span class="hljs-value"><span class="hljs-string">"Martinique"</span></span>,
+            "<span class="hljs-attribute">MR</span>": <span class="hljs-value"><span class="hljs-string">"Mauritania"</span></span>,
+            "<span class="hljs-attribute">MU</span>": <span class="hljs-value"><span class="hljs-string">"Mauritius"</span></span>,
+            "<span class="hljs-attribute">YT</span>": <span class="hljs-value"><span class="hljs-string">"Mayotte"</span></span>,
+            "<span class="hljs-attribute">MX</span>": <span class="hljs-value"><span class="hljs-string">"Mexico"</span></span>,
+            "<span class="hljs-attribute">FM</span>": <span class="hljs-value"><span class="hljs-string">"Micronesia"</span></span>,
+            "<span class="hljs-attribute">MD</span>": <span class="hljs-value"><span class="hljs-string">"Moldova"</span></span>,
+            "<span class="hljs-attribute">MC</span>": <span class="hljs-value"><span class="hljs-string">"Monaco"</span></span>,
+            "<span class="hljs-attribute">MN</span>": <span class="hljs-value"><span class="hljs-string">"Mongolia"</span></span>,
+            "<span class="hljs-attribute">ME</span>": <span class="hljs-value"><span class="hljs-string">"Montenegro"</span></span>,
+            "<span class="hljs-attribute">MS</span>": <span class="hljs-value"><span class="hljs-string">"Montserrat"</span></span>,
+            "<span class="hljs-attribute">MA</span>": <span class="hljs-value"><span class="hljs-string">"Morocco"</span></span>,
+            "<span class="hljs-attribute">MZ</span>": <span class="hljs-value"><span class="hljs-string">"Mozambique"</span></span>,
+            "<span class="hljs-attribute">MM</span>": <span class="hljs-value"><span class="hljs-string">"Myanmar [Burma]"</span></span>,
+            "<span class="hljs-attribute">NA</span>": <span class="hljs-value"><span class="hljs-string">"Namibia"</span></span>,
+            "<span class="hljs-attribute">NR</span>": <span class="hljs-value"><span class="hljs-string">"Nauru"</span></span>,
+            "<span class="hljs-attribute">NP</span>": <span class="hljs-value"><span class="hljs-string">"Nepal"</span></span>,
+            "<span class="hljs-attribute">NL</span>": <span class="hljs-value"><span class="hljs-string">"Netherlands"</span></span>,
+            "<span class="hljs-attribute">AN</span>": <span class="hljs-value"><span class="hljs-string">"Netherlands Antilles"</span></span>,
+            "<span class="hljs-attribute">NC</span>": <span class="hljs-value"><span class="hljs-string">"New Caledonia"</span></span>,
+            "<span class="hljs-attribute">NZ</span>": <span class="hljs-value"><span class="hljs-string">"New Zealand"</span></span>,
+            "<span class="hljs-attribute">NI</span>": <span class="hljs-value"><span class="hljs-string">"Nicaragua"</span></span>,
+            "<span class="hljs-attribute">NE</span>": <span class="hljs-value"><span class="hljs-string">"Niger"</span></span>,
+            "<span class="hljs-attribute">NG</span>": <span class="hljs-value"><span class="hljs-string">"Nigeria"</span></span>,
+            "<span class="hljs-attribute">NU</span>": <span class="hljs-value"><span class="hljs-string">"Niue"</span></span>,
+            "<span class="hljs-attribute">NF</span>": <span class="hljs-value"><span class="hljs-string">"Norfolk Island"</span></span>,
+            "<span class="hljs-attribute">MP</span>": <span class="hljs-value"><span class="hljs-string">"Northern Mariana Islands"</span></span>,
+            "<span class="hljs-attribute">KP</span>": <span class="hljs-value"><span class="hljs-string">"North Korea"</span></span>,
+            "<span class="hljs-attribute">NO</span>": <span class="hljs-value"><span class="hljs-string">"Norway"</span></span>,
+            "<span class="hljs-attribute">OM</span>": <span class="hljs-value"><span class="hljs-string">"Oman"</span></span>,
+            "<span class="hljs-attribute">PK</span>": <span class="hljs-value"><span class="hljs-string">"Pakistan"</span></span>,
+            "<span class="hljs-attribute">PW</span>": <span class="hljs-value"><span class="hljs-string">"Palau"</span></span>,
+            "<span class="hljs-attribute">PS</span>": <span class="hljs-value"><span class="hljs-string">"Palestinian Territories"</span></span>,
+            "<span class="hljs-attribute">PA</span>": <span class="hljs-value"><span class="hljs-string">"Panama"</span></span>,
+            "<span class="hljs-attribute">PG</span>": <span class="hljs-value"><span class="hljs-string">"Papua New Guinea"</span></span>,
+            "<span class="hljs-attribute">PY</span>": <span class="hljs-value"><span class="hljs-string">"Paraguay"</span></span>,
+            "<span class="hljs-attribute">PE</span>": <span class="hljs-value"><span class="hljs-string">"Peru"</span></span>,
+            "<span class="hljs-attribute">PH</span>": <span class="hljs-value"><span class="hljs-string">"Philippines"</span></span>,
+            "<span class="hljs-attribute">PN</span>": <span class="hljs-value"><span class="hljs-string">"Pitcairn Islands"</span></span>,
+            "<span class="hljs-attribute">PL</span>": <span class="hljs-value"><span class="hljs-string">"Poland"</span></span>,
+            "<span class="hljs-attribute">PT</span>": <span class="hljs-value"><span class="hljs-string">"Portugal"</span></span>,
+            "<span class="hljs-attribute">PR</span>": <span class="hljs-value"><span class="hljs-string">"Puerto Rico"</span></span>,
+            "<span class="hljs-attribute">QA</span>": <span class="hljs-value"><span class="hljs-string">"Qatar"</span></span>,
+            "<span class="hljs-attribute">RE</span>": <span class="hljs-value"><span class="hljs-string">"R¨|union"</span></span>,
+            "<span class="hljs-attribute">RO</span>": <span class="hljs-value"><span class="hljs-string">"Romania"</span></span>,
+            "<span class="hljs-attribute">RU</span>": <span class="hljs-value"><span class="hljs-string">"Russia"</span></span>,
+            "<span class="hljs-attribute">RW</span>": <span class="hljs-value"><span class="hljs-string">"Rwanda"</span></span>,
+            "<span class="hljs-attribute">BL</span>": <span class="hljs-value"><span class="hljs-string">"Saint Barth¨|lemy"</span></span>,
+            "<span class="hljs-attribute">SH</span>": <span class="hljs-value"><span class="hljs-string">"Saint Helena"</span></span>,
+            "<span class="hljs-attribute">KN</span>": <span class="hljs-value"><span class="hljs-string">"Saint Kitts and Nevis"</span></span>,
+            "<span class="hljs-attribute">LC</span>": <span class="hljs-value"><span class="hljs-string">"Saint Lucia"</span></span>,
+            "<span class="hljs-attribute">MF</span>": <span class="hljs-value"><span class="hljs-string">"Saint Martin"</span></span>,
+            "<span class="hljs-attribute">PM</span>": <span class="hljs-value"><span class="hljs-string">"Saint Pierre and Miquelon"</span></span>,
+            "<span class="hljs-attribute">VC</span>": <span class="hljs-value"><span class="hljs-string">"Saint Vincent and the Grenadines"</span></span>,
+            "<span class="hljs-attribute">WS</span>": <span class="hljs-value"><span class="hljs-string">"Samoa"</span></span>,
+            "<span class="hljs-attribute">SM</span>": <span class="hljs-value"><span class="hljs-string">"San Marino"</span></span>,
+            "<span class="hljs-attribute">ST</span>": <span class="hljs-value"><span class="hljs-string">"S?o Tomé and Príncipe"</span></span>,
+            "<span class="hljs-attribute">SA</span>": <span class="hljs-value"><span class="hljs-string">"Saudi Arabia"</span></span>,
+            "<span class="hljs-attribute">SN</span>": <span class="hljs-value"><span class="hljs-string">"Senegal"</span></span>,
+            "<span class="hljs-attribute">RS</span>": <span class="hljs-value"><span class="hljs-string">"Serbia"</span></span>,
+            "<span class="hljs-attribute">SC</span>": <span class="hljs-value"><span class="hljs-string">"Seychelles"</span></span>,
+            "<span class="hljs-attribute">SL</span>": <span class="hljs-value"><span class="hljs-string">"Sierra Leone"</span></span>,
+            "<span class="hljs-attribute">SG</span>": <span class="hljs-value"><span class="hljs-string">"Singapore"</span></span>,
+            "<span class="hljs-attribute">SK</span>": <span class="hljs-value"><span class="hljs-string">"Slovakia"</span></span>,
+            "<span class="hljs-attribute">SI</span>": <span class="hljs-value"><span class="hljs-string">"Slovenia"</span></span>,
+            "<span class="hljs-attribute">SB</span>": <span class="hljs-value"><span class="hljs-string">"Solomon Islands"</span></span>,
+            "<span class="hljs-attribute">SO</span>": <span class="hljs-value"><span class="hljs-string">"Somalia"</span></span>,
+            "<span class="hljs-attribute">ZA</span>": <span class="hljs-value"><span class="hljs-string">"South Africa"</span></span>,
+            "<span class="hljs-attribute">GS</span>": <span class="hljs-value"><span class="hljs-string">"South Georgia and the South Sandwich Islands"</span></span>,
+            "<span class="hljs-attribute">KR</span>": <span class="hljs-value"><span class="hljs-string">"South Korea"</span></span>,
+            "<span class="hljs-attribute">ES</span>": <span class="hljs-value"><span class="hljs-string">"Spain"</span></span>,
+            "<span class="hljs-attribute">LK</span>": <span class="hljs-value"><span class="hljs-string">"Sri Lanka"</span></span>,
+            "<span class="hljs-attribute">SD</span>": <span class="hljs-value"><span class="hljs-string">"Sudan"</span></span>,
+            "<span class="hljs-attribute">SR</span>": <span class="hljs-value"><span class="hljs-string">"Suriname"</span></span>,
+            "<span class="hljs-attribute">SJ</span>": <span class="hljs-value"><span class="hljs-string">"Svalbard and Jan Mayen"</span></span>,
+            "<span class="hljs-attribute">SZ</span>": <span class="hljs-value"><span class="hljs-string">"Swaziland"</span></span>,
+            "<span class="hljs-attribute">SE</span>": <span class="hljs-value"><span class="hljs-string">"Sweden"</span></span>,
+            "<span class="hljs-attribute">CH</span>": <span class="hljs-value"><span class="hljs-string">"Switzerland"</span></span>,
+            "<span class="hljs-attribute">SY</span>": <span class="hljs-value"><span class="hljs-string">"Syria"</span></span>,
+            "<span class="hljs-attribute">TW</span>": <span class="hljs-value"><span class="hljs-string">"Taiwan"</span></span>,
+            "<span class="hljs-attribute">TJ</span>": <span class="hljs-value"><span class="hljs-string">"Tajikistan"</span></span>,
+            "<span class="hljs-attribute">TZ</span>": <span class="hljs-value"><span class="hljs-string">"Tanzania"</span></span>,
+            "<span class="hljs-attribute">TH</span>": <span class="hljs-value"><span class="hljs-string">"Thailand"</span></span>,
+            "<span class="hljs-attribute">TL</span>": <span class="hljs-value"><span class="hljs-string">"Timor-Leste"</span></span>,
+            "<span class="hljs-attribute">TG</span>": <span class="hljs-value"><span class="hljs-string">"Togo"</span></span>,
+            "<span class="hljs-attribute">TK</span>": <span class="hljs-value"><span class="hljs-string">"Tokelau"</span></span>,
+            "<span class="hljs-attribute">TO</span>": <span class="hljs-value"><span class="hljs-string">"Tonga"</span></span>,
+            "<span class="hljs-attribute">TT</span>": <span class="hljs-value"><span class="hljs-string">"Trinidad and Tobago"</span></span>,
+            "<span class="hljs-attribute">TN</span>": <span class="hljs-value"><span class="hljs-string">"Tunisia"</span></span>,
+            "<span class="hljs-attribute">TR</span>": <span class="hljs-value"><span class="hljs-string">"Turkey"</span></span>,
+            "<span class="hljs-attribute">TM</span>": <span class="hljs-value"><span class="hljs-string">"Turkmenistan"</span></span>,
+            "<span class="hljs-attribute">TC</span>": <span class="hljs-value"><span class="hljs-string">"Turks and Caicos Islands"</span></span>,
+            "<span class="hljs-attribute">TV</span>": <span class="hljs-value"><span class="hljs-string">"Tuvalu"</span></span>,
+            "<span class="hljs-attribute">UG</span>": <span class="hljs-value"><span class="hljs-string">"Uganda"</span></span>,
+            "<span class="hljs-attribute">UA</span>": <span class="hljs-value"><span class="hljs-string">"Ukraine"</span></span>,
+            "<span class="hljs-attribute">AE</span>": <span class="hljs-value"><span class="hljs-string">"United Arab Emirates"</span></span>,
+            "<span class="hljs-attribute">GB</span>": <span class="hljs-value"><span class="hljs-string">"United Kingdom"</span></span>,
+            "<span class="hljs-attribute">US</span>": <span class="hljs-value"><span class="hljs-string">"United States"</span></span>,
+            "<span class="hljs-attribute">UY</span>": <span class="hljs-value"><span class="hljs-string">"Uruguay"</span></span>,
+            "<span class="hljs-attribute">UM</span>": <span class="hljs-value"><span class="hljs-string">"U.S. Minor Outlying Islands"</span></span>,
+            "<span class="hljs-attribute">VI</span>": <span class="hljs-value"><span class="hljs-string">"U.S. Virgin Islands"</span></span>,
+            "<span class="hljs-attribute">UZ</span>": <span class="hljs-value"><span class="hljs-string">"Uzbekistan"</span></span>,
+            "<span class="hljs-attribute">VU</span>": <span class="hljs-value"><span class="hljs-string">"Vanuatu"</span></span>,
+            "<span class="hljs-attribute">VA</span>": <span class="hljs-value"><span class="hljs-string">"Vatican City"</span></span>,
+            "<span class="hljs-attribute">VE</span>": <span class="hljs-value"><span class="hljs-string">"Venezuela"</span></span>,
+            "<span class="hljs-attribute">VN</span>": <span class="hljs-value"><span class="hljs-string">"Vietnam"</span></span>,
+            "<span class="hljs-attribute">WF</span>": <span class="hljs-value"><span class="hljs-string">"Wallis and Futuna"</span></span>,
+            "<span class="hljs-attribute">EH</span>": <span class="hljs-value"><span class="hljs-string">"Western Sahara"</span></span>,
+            "<span class="hljs-attribute">YE</span>": <span class="hljs-value"><span class="hljs-string">"Yemen"</span></span>,
+            "<span class="hljs-attribute">ZM</span>": <span class="hljs-value"><span class="hljs-string">"Zambia"</span></span>,
+            "<span class="hljs-attribute">ZW</span>": <span class="hljs-value"><span class="hljs-string">"Zimbabwe"</span>
+        </span>}</span>,
+        "<span class="hljs-attribute">country</span>": <span class="hljs-value"><span class="hljs-string">"AT"</span>
+    </span>}
+</span>}
+</code></pre>
+        <div class="toplink"><a href="#" class="h1" title="go to top"><span class="glyphicon glyphicon-arrow-up"></a></div>
+    </div>
+</div>
+
+
+</div>
+
+</div>
+
+
+<footer class="footer" style="margin-top:50px;">
+    	Copyright ©2016 FecShop INC. All Rights Reserved.
+</footer>
+<script type="text/javascript">jQuery(document).ready(function () {
+    var shiftWindow = function () { scrollBy(0, -50) };
+    if (location.hash) setTimeout(shiftWindow, 1);
+    window.addEventListener("hashchange", shiftWindow);
+var element = document.createElement("script");
+element.src = "./jssearch.index.js";
+document.body.appendChild(element);
+
+var searchBox = $('#searchbox');
+
+// search when typing in search field
+searchBox.on("keyup", function(event) {
+    var query = $(this).val();
+
+    if (query == '' || event.which == 27) {
+        $('#search-resultbox').hide();
+        return;
+    } else if (event.which == 13) {
+        var selectedLink = $('#search-resultbox a.selected');
+        if (selectedLink.length != 0) {
+            document.location = selectedLink.attr('href');
+            return;
+        }
+    } else if (event.which == 38 || event.which == 40) {
+        $('#search-resultbox').show();
+
+        var selected = $('#search-resultbox a.selected');
+        if (selected.length == 0) {
+            $('#search-results').find('a').first().addClass('selected');
+        } else {
+            var next;
+            if (event.which == 40) {
+                next = selected.parent().next().find('a').first();
+            } else {
+                next = selected.parent().prev().find('a').first();
+            }
+            if (next.length != 0) {
+                var resultbox = $('#search-results');
+                var position = next.position();
+
+//              TODO scrolling is buggy and jumps around
+//                resultbox.scrollTop(Math.floor(position.top));
+//                console.log(position.top);
+
+                selected.removeClass('selected');
+                next.addClass('selected');
+            }
+        }
+
+        return;
+    }
+    $('#search-resultbox').show();
+    $('#search-results').html('<li><span class="no-results">No results</span></li>');
+
+    var result = jssearch.search(query);
+
+    if (result.length > 0) {
+        var i = 0;
+        var resHtml = '';
+
+        for (var key in result) {
+            if (i++ > 20) {
+                break;
+            }
+            resHtml = resHtml +
+            '<li><a href="' + result[key].file.u.substr(3) +'"><span class="title">' + result[key].file.t + '</span>' +
+            '<span class="description">' + result[key].file.d + '</span></a></li>';
+        }
+        $('#search-results').html(resHtml);
+    }
+});
+
+// hide the search results on ESC
+$(document).on("keyup", function(event) { if (event.which == 27) { $('#search-resultbox').hide(); } });
+// hide search results on click to document
+$(document).bind('click', function (e) { $('#search-resultbox').hide(); });
+// except the following:
+searchBox.bind('click', function(e) { e.stopPropagation(); });
+$('#search-resultbox').bind('click', function(e) { e.stopPropagation(); });
+
+});</script></body>
+</html>

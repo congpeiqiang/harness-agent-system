@@ -11,7 +11,8 @@ from app.tools.pdf_parse_tool import (
     clear_pdf_cache,
     get_cache_stats,
 )
-from app.tools.mcp_client_builder import fecmall_tools
+from app.tools.mcp_client_builder import get_mcp_tools_async
+from app.tools.test_tools import get_weather, read_file, get_weather_async
 
 __all__ = [
     # PDF 工具
@@ -22,5 +23,8 @@ __all__ = [
     "get_cache_stats",
     # MCP 工具
     "MCPClientBuilder",
-    "fecmall_tools",
+    "get_mcp_tools_async",
+    "get_weather",
+    "read_file",
+    "get_weather_async",
 ]

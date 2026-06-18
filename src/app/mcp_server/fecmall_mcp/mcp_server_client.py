@@ -90,4 +90,3 @@ async def mcp_tools():
 
 
 tools = asyncio.run(mcp_tools())
-print(tools)

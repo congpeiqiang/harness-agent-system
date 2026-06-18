@@ -1,0 +1,48 @@
+{
+  "name": "批量调用测试",
+  "description": "测试批量调用 agent 接口",
+  "request": {
+    "method": "POST",
+    "url": "http://localhost:2026/batch",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "inputs": [
+        {
+          "messages": [
+            {
+              "role": "user",
+              "content": "什么是机器学习？"
+            }
+          ]
+        },
+        {
+          "messages": [
+            {
+              "role": "user",
+              "content": "什么是深度学习？"
+            }
+          ]
+        },
+        {
+          "messages": [
+            {
+              "role": "user",
+              "content": "什么是自然语言处理？"
+            }
+          ]
+        }
+      ],
+      "config": {
+        "configurable": {
+          "thread_id": "test-thread-batch"
+        }
+      }
+    }
+  },
+  "expected_response": {
+    "status_code": 200,
+    "body_contains": ["status", "results"]
+  }
+}
