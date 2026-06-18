@@ -94,3 +94,4 @@
 2026-06-18 11:34:31 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
 2026-06-18 11:36:38 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
 2026-06-18 11:37:07 | INFO     | app.middleware.pdf_parse_middleware:60 | 调用中间件(PDFParseMiddleware)异步，处理前的消息数量: 1
+2026-06-18 11:39:00 | INFO     | app.middleware.pdf_parse_middleware:60 | 调用中间件(PDFParseMiddleware)异步，处理前的消息数量: 5
