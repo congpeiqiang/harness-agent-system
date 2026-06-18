@@ -1,8 +1,8 @@
 """
-@File    :  __init__.py
-@Author  :  CodeGeeX
-@Time    :  2026/5/25
-@Desc    :  MCP 服务器模块
+FecMall MCP 服务器模块。
+
+提供 FecMall 电商平台的 MCP 服务器实现。
 """
 
-__all__ = []
+# 此模块包含 FecMall MCP 服务器的实现
+# 详见 fecmall_check/mcp_server.py

@@ -1,19 +1,26 @@
-"""Agent state and context schemas."""
+"""
+自定义 Agent 状态定义。
 
-from typing import Annotated, Any
-from typing_extensions import TypedDict, NotRequired
+继承 LangGraph 的 Annotation 系统，添加应用特定状态字段。
+"""
 
-from langchain.agents.middleware.types import AgentState, add_messages
+from typing import Any, Annotated
+from operator import add
+
 from langchain_core.messages import AnyMessage
-from pydantic import BaseModel, Field
+from langgraph.graph import MessagesState, add_messages
 
 
-class CustomState(AgentState):
-    """Custom agent state extending AgentState with additional fields."""
-    question: NotRequired[str]
-    answer: NotRequired[str]
+class CustomState(MessagesState):
+    """自定义状态，用于 Agent 的执行。"""
+    pdf_parsed: bool = False
+    parsed_content: str = ""
+    attachments: list[dict[str, Any]] = []
 
-class ContextState(BaseModel):
-    """Runtime context for agent execution."""
-    user_id: str = Field(default="")
-    thread_id: str = Field(default="")
+
+class ContextState:
+    """上下文状态定义。"""
+    user_id: str = ""
+    thread_id: str = ""
+    permissions: list[str] = []
+    metadata: dict[str, Any] = {}

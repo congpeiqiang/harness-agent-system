@@ -1,0 +1,76 @@
+# ============================================================
+# Docker Ignore - Files to exclude from Docker context
+# ============================================================
+
+# Version control
+.git
+.github
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.swp
+*.swo
+*~
+
+# Python
+__pycache__
+*.py[cod]
+*$py.class
+*.so
+*.egg-info
+*.egg
+dist
+build
+.eggs
+
+# Virtual environments
+.venv
+venv
+ENV
+
+# Testing
+.pytest_cache
+htmlcov
+.coverage
+.coverage.*
+coverage.xml
+
+# Type checking
+.mypy_cache
+
+# Docker
+docker/*.yml
+docker/*.yaml
+.dockerignore
+Dockerfile
+
+# Documentation
+docs
+*.md
+!README.md
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.vscode
+.idea
+*.code-workspace
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project specific
+checkpoints.sqlite*
+*.sqlite
+fecmall_check/
+uploads/
+graph.json
+*.pckl
+data/

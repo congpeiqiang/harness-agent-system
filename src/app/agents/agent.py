@@ -1,228 +1,156 @@
 """
-@File    :  agent.py
-@Author  :  CongPeiQiang
-@Time    :  2026/5/21 20:09
-@Desc    :  Agent factory with pluggable checkpointer / store.
-"""
-import time
+Agent 工厂模块，支持可插拔的检查点和存储。
 
-from langchain.agents import create_agent
-from dotenv import load_dotenv
-from langchain.agents.middleware import before_model
-from langchain.agents import AgentState
-from langgraph.runtime import Runtime
-import os
-from watchfiles import awatch
-from app.middleware.pdf_parse_middleware import PDFParseMiddleware
-from langchain.agents.middleware import HumanInTheLoopMiddleware, ToolCallLimitMiddleware, SummarizationMiddleware, ModelFallbackMiddleware
-from deepagents.backends.filesystem import FilesystemBackend
-from deepagents.middleware.skills import SkillsMiddleware
-from app.tools import parse_pdf_from_file, parse_pdf_from_content, parse_pdf_from_url
-from app.tools import get_weather, read_file, get_weather_async
-from langchain.chat_models import init_chat_model
-from app.tools.mcp_client_builder import get_mcp_tools_async
-from langgraph.types import Command
+本模块构建 LangGraph Agent，配置中间件、工具和持久化层。
+"""
+
 import asyncio
+import os
+from typing import Any
+
+from dotenv import load_dotenv
+from langchain.agents import AgentState, create_agent
+from langchain.agents.middleware import (
+    HumanInTheLoopMiddleware,
+    ModelFallbackMiddleware,
+    ToolCallLimitMiddleware,
+    before_model,
+)
+from langchain.chat_models import init_chat_model
+from langgraph.runtime import Runtime
+
+from app.core.config import settings
 from app.core.state import CustomState, ContextState
+from app.middleware.pdf_parse_middleware import PDFParseMiddleware
+from app.tools import (
+    get_weather,
+    parse_pdf_from_content,
+    parse_pdf_from_file,
+    parse_pdf_from_url,
+)
+from app.tools.mcp_client_builder import get_mcp_tools_async
 
 load_dotenv()
 
 
+# ---------------------------------------------------------------------------
+# 模型调用前的钩子（用于日志记录）
+# ---------------------------------------------------------------------------
+
 @before_model
 def print_hook(state: AgentState, runtime: Runtime):
-    print("Before calling model")
-    print(state)
+    """在每次模型调用前记录执行信息。"""
     execution_info = getattr(runtime, "execution_info", None)
     server_info = getattr(runtime, "server_info", None)
-    if execution_info:
-        thread_id = getattr(execution_info, "thread_id", "unknown")
-    else:
-        thread_id = "unknown"
-    if server_info:
-        assistant_id = getattr(server_info, "assistant_id", "unknown")
-    else:
-        assistant_id = "unknown"
-    print(f"Thread ID: {thread_id}\nAssistant ID: {assistant_id}")
+    thread_id = getattr(execution_info, "thread_id", "未知") if execution_info else "未知"
+    assistant_id = getattr(server_info, "assistant_id", "未知") if server_info else "未知"
+    print(f"[agent] 线程: {thread_id} | 助手: {assistant_id}")
     return state
 
 
-humanInTheLoopMiddleware = [
+# ---------------------------------------------------------------------------
+# 中间件配置
+# ---------------------------------------------------------------------------
+
+# 人机交互中间件：需要审批的操作
+human_in_loop_middleware = [
     HumanInTheLoopMiddleware(
         interrupt_on={
-            "customer_login_submit_tool": {
-                "allowed_decisions": ["approve", "edit", "reject"],
-            },
-            "submit_register_tool": {
-                "allowed_decisions": ["approve", "edit", "reject"],
-            },
-            "paypal_express_start_tool": {
-                "allowed_decisions": ["approve", "edit", "reject"],
-            },
-            "paypal_express_submit_tool": {
-                "allowed_decisions": ["approve", "edit", "reject"],
-            },
-            "paypal_standard_start_tool": {
-                "allowed_decisions": ["approve", "edit", "reject"],
-            },
-            "checkmoney_start_tool": {
-                "allowed_decisions": ["approve", "edit", "reject"],
-            },
+            "customer_login_submit_tool": {"allowed_decisions": ["approve", "edit", "reject"]},
+            "submit_register_tool": {"allowed_decisions": ["approve", "edit", "reject"]},
+            "paypal_express_start_tool": {"allowed_decisions": ["approve", "edit", "reject"]},
+            "paypal_express_submit_tool": {"allowed_decisions": ["approve", "edit", "reject"]},
+            "paypal_standard_start_tool": {"allowed_decisions": ["approve", "edit", "reject"]},
+            "checkmoney_start_tool": {"allowed_decisions": ["approve", "edit", "reject"]},
         }
     )
 ]
 
-toolCallLimitMiddleware = [
+# 工具调用限制中间件
+tool_call_limit_middleware = [
     ToolCallLimitMiddleware(
         tool_name="get_weather_async",
         thread_limit=20,
-        run_limit=3
+        run_limit=3,
     ),
-    # ToolCallLimitMiddleware(
-    #     tool_name="get_weather",
-    #     thread_limit=20,
-    #     run_limit=3
-    # )
 ]
 
-model = init_chat_model(
-    os.getenv("DEEPSEEK_MODEL"),
-    model_provider=os.getenv("DEEPSEEK_MODEL_PROVIDER"),
-    api_key=os.getenv("DEEPSEEK_API_KEY"),
-    base_url=os.getenv("DEEPSEEK_BASE_URL")
-)
 
-backend = FilesystemBackend(
-    root_dir="/code_work_space/llm/huice/008/harness-agent-system/src/app/workspace/skills",
-    virtual_mode=True
-)
-skillsMiddleware = SkillsMiddleware(
-    backend=backend,
-    sources=["./fecmall_skills"],
-)
+# ---------------------------------------------------------------------------
+# 模型初始化
+# ---------------------------------------------------------------------------
 
-from langgraph.checkpoint.sqlite.aio import AsyncSqliteSaver
-from langgraph.store.sqlite import AsyncSqliteStore
+_model = None
 
-async def async_init_checkpointer_store():
-    import aiosqlite
-    # 方式二: 直接初始化（需要手动管理连接）
-    conn = await aiosqlite.connect(r"D:\code_work_space\llm\huice\008\harness-agent-system\checkpoints.sqlite")
-    saver = AsyncSqliteSaver(conn)
-    store = AsyncSqliteStore(conn)
-    return saver, store
 
-# 等待 MCP 工具初始化完成
-def get_all_tools():
+def _get_model():
+    """延迟初始化 LLM 模型。"""
+    global _model
+    if _model is None:
+        _model = init_chat_model(
+            os.getenv("DEEPSEEK_MODEL", settings.deepseek_model),
+            model_provider=os.getenv("DEEPSEEK_MODEL_PROVIDER", "deepseek"),
+            api_key=os.getenv("DEEPSEEK_API_KEY", settings.deepseek_api_key),
+            base_url=os.getenv("DEEPSEEK_BASE_URL", settings.deepseek_base_url),
+        )
+    return _model
+
+
+# ---------------------------------------------------------------------------
+# 工具收集
+# ---------------------------------------------------------------------------
+
+async def get_all_tools_async() -> list[Any]:
+    """收集所有可用工具（内置 + MCP）。"""
     tools = [
         get_weather,
         parse_pdf_from_file,
         parse_pdf_from_content,
-        parse_pdf_from_url
+        parse_pdf_from_url,
     ]
-    mcp_tools = asyncio.run(get_mcp_tools_async())
-    tools.extend(mcp_tools)
-    return tools
-
-async def get_all_tools_async():
-    tools = [
-        get_weather,
-        parse_pdf_from_file,
-        parse_pdf_from_content,
-        parse_pdf_from_url
-    ]
-    # mcp_tools = asyncio.run(get_mcp_tools_async())
     mcp_tools = await get_mcp_tools_async()
     tools.extend(mcp_tools)
     return tools
 
 
-# tools = get_all_tools()
-#
-# agent = create_agent(
-#         model=model,
-#         state_schema=CustomState,
-#         context_schema=ContextState,
-#         tools=tools,
-#         system_prompt="You are a helpful assistant",
-#         middleware=[
-#             print_hook,
-#             PDFParseMiddleware(),
-#             ModelFallbackMiddleware(os.getenv("DEEPSEEK_MODEL"), os.getenv("DEEPSEEK_MODEL")),
-#             *humanInTheLoopMiddleware,
-#             *toolCallLimitMiddleware
-#         ]
-#     )
+def get_all_tools() -> list[Any]:
+    """get_all_tools_async 的同步版本。"""
+    tools = [
+        get_weather,
+        parse_pdf_from_file,
+        parse_pdf_from_content,
+        parse_pdf_from_url,
+    ]
+    mcp_tools = asyncio.run(get_mcp_tools_async())
+    tools.extend(mcp_tools)
+    return tools
 
 
+# ---------------------------------------------------------------------------
+# Agent 构建器
+# ---------------------------------------------------------------------------
 
+async def build_agent(checkpointer: Any, store: Any) -> Any:
+    """构建并返回 Agent 实例，使用给定的持久化层。"""
+    model = _get_model()
+    tools = await get_all_tools_async()
 
-async def build_agent(checkpointer, store):
-    """Build and return an agent instance with the given persistence layers."""
-    tools = await  get_all_tools_async()
     return create_agent(
         model=model,
         state_schema=CustomState,
         context_schema=ContextState,
         tools=tools,
-        system_prompt="You are a helpful assistant",
+        system_prompt="你是一个有帮助的助手",
         middleware=[
             print_hook,
             PDFParseMiddleware(),
-            ModelFallbackMiddleware(os.getenv("DEEPSEEK_MODEL"), os.getenv("DEEPSEEK_MODEL")),
-            *humanInTheLoopMiddleware,
-            *toolCallLimitMiddleware
+            ModelFallbackMiddleware(
+                os.getenv("DEEPSEEK_MODEL", settings.deepseek_model),
+                os.getenv("DEEPSEEK_MODEL", settings.deepseek_model),
+            ),
+            *human_in_loop_middleware,
+            *tool_call_limit_middleware,
         ],
         checkpointer=checkpointer,
         store=store,
     )
-
-
-async def astream_demo():
-    from langgraph.checkpoint.memory import MemorySaver
-    from langgraph.store.memory import InMemoryStore
-
-    cp = MemorySaver()
-    st = InMemoryStore()
-    agent = await build_agent(cp, st)
-    config = {"configurable": {"thread_id": "thread_id-111"}}
-    async for chunk in agent.astream(
-        # {"messages": [{"role": "user", "content": r"登录fecmall, email是1539397036@qq.com, password是123456"}]},
-        {"messages": [{"role": "user", "content": r"无锡天气？"}]},
-        config=config,
-        context=ContextState(
-                    user_id="user_id_111",
-                    thread_id="thread_id_111",
-                ),
-        stream_mode="values",
-        version="v2"
-    ):
-        print(chunk)
-        if "__interrupt__" in chunk["data"]:
-            print(chunk["data"]["__interrupt__"])
-
-
-# if __name__ == '__main__':
-    # from langgraph.checkpoint.memory import MemorySaver
-    # from langgraph.store.memory import InMemoryStore
-    #
-    # cp = MemorySaver()
-    # st = InMemoryStore()
-    # agent = build_agent(cp, st)
-
-    # result = agent.ainvoke(
-    #     {
-    #         "messages": [{"role": "user", "content": r"无锡天气?"}],
-    #         "question":"无锡天气?"
-    #     },
-    #     config={"configurable": {"thread_id": "thread_id_111"}},
-    #     context=ContextState(
-    #         user_id="user_id_111",
-    #         thread_id="thread_id_111",
-    #     )
-    # )
-    # print("======result======")
-    # print(result)
-    # for msg in result["messages"]:
-    #     msg.pretty_print()
-
-    # asyncio.run(astream_demo())

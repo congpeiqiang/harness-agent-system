@@ -1,0 +1,80 @@
+# ============================================================
+# Harness Agent System - Git Ignore
+# ============================================================
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+*.code-workspace
+
+# Testing
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+reports/
+
+# Type checking
+.mypy_cache/
+
+# Linting
+.ruff_cache/
+
+# Docker
+docker/*.yml
+docker/*.yaml
+
+# OS
+.DS_Store
+Thumbs.db
+Thumbs.db:encryptable
+
+# Logs
+*.log
+logs/
+
+# SQLite databases
+checkpoints.sqlite
+checkpoints.sqlite-shm
+checkpoints.sqlite-wal
+store.sqlite
+store.sqlite-shm
+store.sqlite-wal
+data/*.sqlite
+data/*.sqlite-shm
+data/*.sqlite-wal
+
+# LangGraph
+.langgraph_api/
+*.pckl
+
+# Project specific
+fecmall_check/
+uploads/
+graph.json
