@@ -96,3 +96,16 @@
 2026-06-18 11:37:07 | INFO     | app.middleware.pdf_parse_middleware:60 | 调用中间件(PDFParseMiddleware)异步，处理前的消息数量: 1
 2026-06-18 11:39:00 | INFO     | app.middleware.pdf_parse_middleware:60 | 调用中间件(PDFParseMiddleware)异步，处理前的消息数量: 5
 2026-06-18 12:20:49 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 12:28:50 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 12:55:19 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 12:55:50 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 12:56:19 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 13:35:04 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 13:43:15 | INFO     | app.middleware.pdf_parse_middleware:164 | 调用中间件(PDFParseMiddleware)，处理前的消息数量: 1
+2026-06-18 13:43:24 | INFO     | app.middleware.pdf_parse_middleware:164 | 调用中间件(PDFParseMiddleware)，处理前的消息数量: 3
+2026-06-18 13:43:26 | INFO     | app.middleware.pdf_parse_middleware:60 | 调用中间件(PDFParseMiddleware)异步，处理前的消息数量: 1
+2026-06-18 13:43:31 | INFO     | app.middleware.pdf_parse_middleware:60 | 调用中间件(PDFParseMiddleware)异步，处理前的消息数量: 3
+2026-06-18 13:43:32 | INFO     | app.middleware.pdf_parse_middleware:164 | 调用中间件(PDFParseMiddleware)，处理前的消息数量: 1
+2026-06-18 13:43:36 | INFO     | app.middleware.pdf_parse_middleware:164 | 调用中间件(PDFParseMiddleware)，处理前的消息数量: 3
+2026-06-18 13:43:37 | INFO     | app.middleware.pdf_parse_middleware:60 | 调用中间件(PDFParseMiddleware)异步，处理前的消息数量: 1
+2026-06-18 13:43:42 | INFO     | app.middleware.pdf_parse_middleware:60 | 调用中间件(PDFParseMiddleware)异步，处理前的消息数量: 3

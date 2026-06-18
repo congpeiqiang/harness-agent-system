@@ -58,3 +58,8 @@
 2026-06-18 11:34:31 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
 2026-06-18 11:36:38 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
 2026-06-18 12:20:49 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 12:28:50 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 12:55:19 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 12:55:50 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 12:56:19 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
+2026-06-18 13:35:04 | INFO     | app.processors.pdf_parser:132 | PDFParser 初始化完成 | 多模态: False | 提取图像: False | 模式: single | 共享缓存大小: 128
