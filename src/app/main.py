@@ -107,7 +107,7 @@ except ImportError:
     limiter = None
 
 # --- 路由注册 ---
-app.include_router(agent_router)
+app.include_router(agent_router, prefix="/agent")
 
 
 # ---------------------------------------------------------------------------
